@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusDev.AI — Engine Pro v4.1</title>
+    <title>NexusDev.AI — Engine Pro v4.2</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -46,7 +46,7 @@
             <div class="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7] animate-pulse"></div>
             <div>
                 <span class="font-bold tracking-tight text-sm text-white">NexusDev<span class="text-purple-400">.AI</span></span>
-                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.1-fixed</span>
+                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.2-media</span>
             </div>
         </div>
         <div class="text-[10px] font-mono text-slate-400 bg-slate-900/40 px-2.5 py-1 rounded-md border border-slate-800/60 tracking-wider">
@@ -56,7 +56,7 @@
 
     <main class="w-full max-w-2xl mx-auto flex flex-col h-screen pt-[65px] relative z-10">
         
-        <div id="chat-box" class="no-scrollbar flex-1 overflow-y-auto px-4 py-6 space-y-10 pb-44">
+        <div id="chat-box" class="no-scrollbar flex-1 overflow-y-auto px-4 py-6 space-y-10 pb-52">
             
             <div class="flex gap-4 items-start opacity-90 message-fade-in">
                 <div class="w-6 h-6 rounded border border-slate-800 bg-slate-900/40 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
@@ -64,23 +64,38 @@
                 </div>
                 <div class="flex-1 space-y-2 text-sm text-slate-400 leading-relaxed">
                     <p class="font-mono text-xs text-slate-500 tracking-wider">WORKSPACE INITIALIZED.</p>
-                    <p>Halo, Sean. Ruang pengembangan bot, koding backend, dan live web preview canvas siap digunakan. Kirimkan instruksi kodingan yang ingin kamu bangun.</p>
+                    <p>Halo, Sean. Ruang pengembangan bot, koding backend, dan analisis UI via unggah foto siap digunakan. Kirimkan gambar atau instruksi logika yang ingin kamu bangun.</p>
                 </div>
             </div>
 
         </div>
 
-        <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent pt-10 pb-6 px-4 z-50">
-            <div class="max-w-2xl mx-auto bg-slate-900/60 border border-slate-800/80 rounded-2xl p-2 backdrop-blur-2xl shadow-2xl focus-within:border-purple-500/40 focus-within:shadow-[0_0_30px_rgba(168,85,247,0.08)] transition-all duration-300">
+        <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent pt-6 pb-6 px-4 z-50">
+            <div class="max-w-2xl mx-auto bg-slate-900/60 border border-slate-800/80 rounded-2xl p-2 backdrop-blur-2xl shadow-2xl focus-within:border-purple-500/40 focus-within:shadow-[0_0_30px_rgba(168,85,247,0.08)] transition-all duration-300 flex flex-col gap-2">
+                
+                <div id="image-preview-container" class="hidden items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl w-fit relative group">
+                    <img id="image-preview" src="" alt="Preview" class="h-14 w-14 object-cover rounded-lg border border-slate-700">
+                    <button type="button" id="remove-image-btn" class="absolute -top-1.5 -right-1.5 h-5 w-5 bg-rose-500 hover:bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px] cursor-pointer shadow-md">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
                 <form id="chat-form" class="flex items-end gap-2">
+                    <input type="file" id="file-input" accept="image/*" class="hidden">
+                    
+                    <button type="button" id="attach-btn" class="h-9 w-9 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 flex items-center justify-center transition-all cursor-pointer shrink-0 mb-0.5 border border-slate-700/50">
+                        <i class="fa-regular fa-image text-sm"></i>
+                    </button>
+
                     <textarea 
                         id="user-input"
                         rows="1"
-                        placeholder="Ketik instruksi koding bot atau website..."
+                        placeholder="Ketik instruksi atau lampirkan foto UI..."
                         class="flex-1 bg-transparent border-0 outline-none p-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-0 max-h-36 overflow-y-auto no-scrollbar h-[38px]"
                         required
                         autocomplete="off"
                     ></textarea>
+                    
                     <button type="submit" id="send-btn" class="h-9 w-9 rounded-xl bg-slate-100 hover:bg-white text-slate-950 flex items-center justify-center transition-all active:scale-95 cursor-pointer shrink-0 shadow-md mb-0.5">
                         <i class="fa-solid fa-arrow-up text-xs"></i>
                     </button>
@@ -94,6 +109,39 @@
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const fileInput = document.getElementById('file-input');
+        const attachBtn = document.getElementById('attach-btn');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeImageBtn = document.getElementById('remove-image-btn');
+
+        let selectedImageBase64 = "";
+
+        // Triger klik input file lewat icon image
+        attachBtn.addEventListener('click', () => fileInput.click());
+
+        // Handle event ketika foto dipilih
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImageBase64 = e.target.result;
+                    imagePreview.src = selectedImageBase64;
+                    imagePreviewContainer.style.display = 'flex'; // Munculkan preview kotak foto
+                    userInput.required = false; // Jika kirim gambar, teks boleh kosong
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Hapus attachment gambar
+        removeImageBtn.addEventListener('click', () => {
+            selectedImageBase64 = "";
+            fileInput.value = "";
+            imagePreviewContainer.style.display = 'none';
+            userInput.required = true;
+        });
 
         // Auto-resize textarea teks ke bawah pas ngetik panjang
         userInput.addEventListener('input', function() {
@@ -116,12 +164,19 @@ When asked to build a discord bot core setup, write the code inside a file archi
 
         function generateDynamicSteps(promptText) {
             const text = promptText.toLowerCase();
+            if (selectedImageBase64) {
+                return [
+                    "Mengompresi data visual media...",
+                    "Mengekstrak komponen UI dari gambar...",
+                    "Menganalisis arsitektur rancangan visual...",
+                    "Menyusun respons solusi koding kompilasi..."
+                ];
+            }
             if (text.includes('web') || text.includes('page') || text.includes('html') || text.includes('css')) {
                 return [
                     "Menganalisis skema layout UI...",
                     "Menyusun berkas 'index.html'...",
                     "Menginjeksikan utilitas gaya Tailwind CSS...",
-                    "Menyiapkan wadah render Canvas Preview...",
                     "Menampilkan kode sumber website lengkap..."
                 ];
             }
@@ -146,14 +201,25 @@ When asked to build a discord bot core setup, write the code inside a file archi
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const message = userInput.value.trim();
-            if (!message) return;
+            if (!message && !selectedImageBase64) return;
 
-            appendMessage('user', message);
+            // Render bubble user chat ke interface
+            appendMessage('user', message, selectedImageBase64);
+            
+            // Backup asset data sebelum form di-clear
+            const activeImage = selectedImageBase64;
+            const activeMessage = message;
+
+            // Reset Form Input & Status UI
             userInput.value = '';
             userInput.style.height = '38px';
+            selectedImageBase64 = "";
+            fileInput.value = "";
+            imagePreviewContainer.style.display = 'none';
+            userInput.required = true;
             setLoading(true);
 
-            const currentLoadingSteps = generateDynamicSteps(message);
+            const currentLoadingSteps = generateDynamicSteps(activeMessage);
             const botMessageId = appendMessage('bot', `
                 <div class="flex items-center gap-2.5 text-slate-400 font-mono text-xs py-1">
                     <i class="fa-solid fa-circle-notch animate-spin text-purple-400"></i>
@@ -171,15 +237,30 @@ When asked to build a discord bot core setup, write the code inside a file archi
             }, 900);
 
             try {
+                // Membangun payload pesan untuk API Pollinations
+                let apiMessages = [
+                    { role: "system", content: SYSTEM_PROMPT }
+                ];
+
+                if (activeImage) {
+                    // Masukkan multimodal format array jika mendeteksi payload gambar base64
+                    apiMessages.push({
+                        role: "user",
+                        content: [
+                            { type: "text", text: activeMessage || "Analisis gambar kodingan berikut ini." },
+                            { type: "image_url", image_url: { url: activeImage } }
+                        ]
+                    });
+                } else {
+                    apiMessages.push({ role: "user", content: activeMessage });
+                }
+
                 const response = await fetch('https://text.pollinations.ai/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        messages: [
-                            { role: "system", content: SYSTEM_PROMPT },
-                            { role: "user", content: message }
-                        ],
-                        model: "openai",
+                        messages: apiMessages,
+                        model: "openai", // OpenAI model di Pollinations mendukung multimodal image input
                         jsonMode: false
                     })
                 });
@@ -199,12 +280,23 @@ When asked to build a discord bot core setup, write the code inside a file archi
             }
         });
 
-        function appendMessage(sender, text) {
+        function appendMessage(sender, text, imageBase64 = "") {
             const id = 'msg-' + Date.now();
             const msgDiv = document.createElement('div');
             const isUser = sender === 'user';
             
             msgDiv.className = `flex gap-4 items-start message-fade-in ${isUser ? 'justify-end' : ''}`;
+            
+            let messageContentHTML = "";
+            if (imageBase64) {
+                messageContentHTML += `<img src="${imageBase64}" class="max-w-[200px] rounded-xl border border-slate-800 shadow-md block mb-2">`;
+            }
+            if (text) {
+                messageContentHTML += isUser ? escapeHTML(text) : text;
+            } else if (!text && isUser && imageBase64) {
+                messageContentHTML += `<span class="text-xs text-slate-500 italic">Mengirim gambar...</span>`;
+            }
+
             msgDiv.innerHTML = `
                 ${!isUser ? `
                     <div class="w-6 h-6 rounded border border-slate-800 bg-slate-900/60 flex items-center justify-center text-purple-400 shrink-0 mt-1">
@@ -212,7 +304,7 @@ When asked to build a discord bot core setup, write the code inside a file archi
                     </div>
                 ` : ''}
                 <div id="${id}" class="${isUser ? 'bg-slate-900 border border-slate-800/80 rounded-xl px-4 py-2.5 max-w-[85%] text-sm text-slate-200' : 'flex-1 text-sm text-slate-300 leading-relaxed prose pl-3 border-l-2 border-purple-500/40'}">
-                    ${isUser ? escapeHTML(text) : text}
+                    ${messageContentHTML}
                 </div>
             `;
             
@@ -221,16 +313,12 @@ When asked to build a discord bot core setup, write the code inside a file archi
             return id;
         }
 
-        // RE-OPTIMIZED: Sistem pemrosesan code blocks & pendeteksi Canvas HTML super sensitif
         function updateBotMessage(id, rawMarkdown) {
             const container = document.getElementById(id);
             let htmlContent = marked.parse(rawMarkdown);
             container.innerHTML = htmlContent;
 
-            let extractedHTMLCode = "";
-
             container.querySelectorAll('pre').forEach((preElement) => {
-                const codeText = preElement.textContent;
                 const wrapper = document.createElement('div');
                 wrapper.className = "my-4 border border-slate-800/80 rounded-xl overflow-hidden shadow-lg group/code relative w-full";
                 
@@ -239,12 +327,6 @@ When asked to build a discord bot core setup, write the code inside a file archi
                 
                 if(codeClass.includes('language-')) {
                     detectedLang = codeClass.split('language-')[1].toUpperCase();
-                }
-
-                // FIX PREVIEW: Sensitivitas diperluas jika AI menghasilkan tag XML/HTML bawaan
-                if(detectedLang === "HTML" || detectedLang === "XML" || codeText.trim().startsWith("<!DOCTYPE html>") || codeText.trim().startsWith("<html")) {
-                    extractedHTMLCode = codeText;
-                    detectedLang = "HTML/WEB";
                 }
 
                 const topBar = document.createElement('div');
@@ -265,31 +347,6 @@ When asked to build a discord bot core setup, write the code inside a file archi
                 wrapper.appendChild(topBar);
                 wrapper.appendChild(preElement);
             });
-
-            // LIVE CANVAS INJECTION (Renders perfectly inside a clean isolated frame)
-            if(extractedHTMLCode) {
-                const canvasWrapper = document.createElement('div');
-                canvasWrapper.className = "mt-4 border border-slate-800 rounded-xl overflow-hidden bg-slate-950 w-full";
-                
-                const canvasHeader = document.createElement('div');
-                canvasHeader.className = "bg-slate-900/60 px-4 py-2.5 text-[11px] font-mono text-purple-400 border-b border-slate-800 flex items-center gap-2 select-none";
-                canvasHeader.innerHTML = `<i class="fa-solid fa-eye text-[10px]"></i> <span class="font-bold tracking-wide">Live Interactive Canvas Preview</span>`;
-                
-                const iframe = document.createElement('iframe');
-                iframe.className = "w-full h-80 bg-white border-0 block";
-                
-                canvasWrapper.appendChild(canvasHeader);
-                canvasWrapper.appendChild(iframe);
-                container.appendChild(canvasWrapper);
-
-                // Mengisi dokumen iframe dengan script yang aman & sandboxed
-                setTimeout(() => {
-                    const doc = iframe.contentWindow.document;
-                    doc.open();
-                    doc.write(extractedHTMLCode);
-                    doc.close();
-                }, 150);
-            }
 
             container.querySelectorAll('pre code').forEach((el) => {
                 hljs.highlightElement(el);
@@ -328,27 +385,4 @@ When asked to build a discord bot core setup, write the code inside a file archi
 
             const blob = new Blob([actualCode], { type: "text/plain;charset=utf-8" });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `script_${Date.now()}.${ext}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        };
-
-        function setLoading(isLoading) {
-            userInput.disabled = isLoading;
-            sendBtn.disabled = isLoading;
-            if(!isLoading) {
-                userInput.focus();
-            }
-        }
-
-        function escapeHTML(str) {
-            if(str.includes('animate-spin') || str.includes('text-rose-400')) return str;
-            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-        }
-    </script>
-</body>
-    </html>
+         
