@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusDev.AI — Engine Vision v4.9</title>
+    <title>NexusDev.AI — Engine Pro v4.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,9 +13,13 @@
     
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030712; }
+        
+        /* Custom Scrollbar Ringan untuk Workspace Chat */
         .no-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .no-scrollbar::-webkit-scrollbar-thumb { background: #1e1b4b; border-radius: 10px; }
+        .no-scrollbar::-webkit-scrollbar-track { background: transparent; }
         
+        /* Source Code Bisa Digeser Kanan-Kiri & Tidak Keluar Kotak */
         .prose pre { 
             background: #070a13 !important; 
             padding: 1.25rem; 
@@ -33,6 +37,7 @@
             white-space: pre !important;
         }
         
+        /* Smooth Fade In Animation */
         .message-fade-in {
             animation: cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards msgFade;
         }
@@ -53,47 +58,38 @@
             <div class="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7] animate-pulse"></div>
             <div>
                 <span class="font-bold tracking-tight text-sm text-white">NexusDev<span class="text-purple-400">.AI</span></span>
-                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.9-p1-multimodal</span>
+                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.0-text-only</span>
             </div>
         </div>
         <div class="text-[10px] font-mono text-slate-400 bg-slate-900/40 px-2.5 py-1 rounded-md border border-slate-800/60 tracking-wider">
-            CORE: P1_VISION_ENGINE
+            CORE: TEXT_ENGINE
         </div>
     </header>
 
     <main class="w-full max-w-2xl mx-auto flex flex-col h-screen pt-[65px] relative z-10">
-        <div id="chat-box" class="no-scrollbar flex-1 overflow-y-auto px-4 py-6 space-y-10 pb-52">
+        
+        <div id="chat-box" class="no-scrollbar flex-1 overflow-y-auto px-4 py-6 space-y-10 pb-40">
+            
             <div class="flex gap-4 items-start opacity-90 message-fade-in">
                 <div class="w-6 h-6 rounded border border-slate-800 bg-slate-900/40 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
                     <i class="fa-solid fa-layer-group text-[10px]"></i>
                 </div>
                 <div class="flex-1 space-y-2 text-sm text-slate-400 leading-relaxed">
                     <p class="font-mono text-xs text-slate-500 tracking-wider">WORKSPACE INITIALIZED.</p>
-                    <p>Halo, Sean. Sistem engine dialihkan ke model multimodal **P1** yang mendukung penuh pemindaian gambar Base64 secara instan tanpa bug respon kosong.</p>
+                    <p>Halo, Sean. Ruang pengembangan koding, logika bot, dan optimasi arsitektur backend siap digunakan. Ketik perintah kodinganmu di bawah ini.</p>
                 </div>
             </div>
+
         </div>
 
         <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent pt-6 pb-6 px-4 z-50">
             <div class="max-w-2xl mx-auto bg-slate-900/60 border border-slate-800/80 rounded-2xl p-2 backdrop-blur-2xl shadow-2xl focus-within:border-purple-500/40 focus-within:shadow-[0_0_30px_rgba(168,85,247,0.08)] transition-all duration-300 flex flex-col gap-2">
                 
-                <div id="image-preview-container" class="hidden items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl w-fit relative group">
-                    <img id="image-preview" src="" alt="Preview" class="h-14 w-14 object-cover rounded-lg border border-slate-700">
-                    <button type="button" id="remove-image-btn" class="absolute -top-1.5 -right-1.5 h-5 w-5 bg-rose-500 hover:bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px] cursor-pointer shadow-md">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
                 <form id="chat-form" class="flex items-end gap-2">
-                    <input type="file" id="file-input" accept="image/*" class="hidden">
-                    <button type="button" id="attach-btn" class="h-9 w-9 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 flex items-center justify-center transition-all cursor-pointer shrink-0 mb-0.5 border border-slate-700/50">
-                        <i class="fa-solid fa-paperclip text-sm"></i>
-                    </button>
-
                     <textarea 
                         id="user-input"
                         rows="1"
-                        placeholder="Ketik instruksi koding atau sertakan lampiran gambar..."
+                        placeholder="Ketik instruksi koding bot atau website..."
                         class="flex-1 bg-transparent border-0 outline-none p-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-0 max-h-36 overflow-y-auto no-scrollbar h-[38px]"
                         required
                         autocomplete="off"
@@ -112,36 +108,6 @@
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
-        const fileInput = document.getElementById('file-input');
-        const attachBtn = document.getElementById('attach-btn');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-        const imagePreview = document.getElementById('image-preview');
-        const removeImageBtn = document.getElementById('remove-image-btn');
-
-        let selectedImageBase64 = "";
-
-        attachBtn.addEventListener('click', () => fileInput.click());
-
-        fileInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    selectedImageBase64 = e.target.result;
-                    imagePreview.src = selectedImageBase64;
-                    imagePreviewContainer.style.display = 'flex';
-                    userInput.required = false; 
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        removeImageBtn.addEventListener('click', () => {
-            selectedImageBase64 = "";
-            fileInput.value = "";
-            imagePreviewContainer.style.display = 'none';
-            userInput.required = true;
-        });
 
         userInput.addEventListener('input', function() {
             this.style.height = '38px';
@@ -157,28 +123,22 @@
         });
 
         const SYSTEM_PROMPT = `You are NexusDev.AI, an expert Fullstack Software Engineer. 
-Analyze any uploaded error logs/images with high precision, identify code duplicates, and provide structural fixes. 
-Always tell the user to use 'config.json' for private keys instead of hardcoding. Code architecture must default to 'merpati.js' for Discord bots. Answer completely in Indonesian.`;
+Provide professional, clean, and highly modular source code for backend services, responsive websites, or Discord bot architectures (discord.js).
+Always guide the user to separate sensitive tokens inside a 'config.json' file instead of hardcoding them into the core logic file. 
+When asked to build a discord bot core setup, write the code inside a file architecture concept named 'merpati.js'. Speak in Indonesian language.`;
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const message = userInput.value.trim();
-            if (!message && !selectedImageBase64) return;
+            if (!message) return;
 
-            appendMessage('user', message, selectedImageBase64);
+            appendMessage('user', message);
             
-            const activeImage = selectedImageBase64;
-            const activeMessage = message;
-
             userInput.value = '';
             userInput.style.height = '38px';
-            selectedImageBase64 = "";
-            fileInput.value = "";
-            imagePreviewContainer.style.display = 'none';
-            userInput.required = true;
             setLoading(true);
 
-            // Teks loading disederhanakan mutlak
+            // LOADING STEP: Diubah permanen menjadi "Sedang berpikir..." untuk semua pertanyaan
             const botMessageId = appendMessage('bot', `
                 <div class="flex items-center gap-2.5 text-slate-400 font-mono text-xs py-1">
                     <i class="fa-solid fa-circle-notch animate-spin text-purple-400"></i>
@@ -187,34 +147,20 @@ Always tell the user to use 'config.json' for private keys instead of hardcoding
             `);
 
             try {
-                let apiMessages = [
-                    { role: "system", content: SYSTEM_PROMPT }
-                ];
-
-                if (activeImage) {
-                    // FIX ABSOLUT MULTIMODAL CONTENT PAYLOAD FOR POLLINATIONS
-                    apiMessages.push({
-                        role: "user",
-                        content: [
-                            { type: "text", text: activeMessage || "Tolong baca error/kodingan yang ada di foto ini dan berikan solusinya." },
-                            { type: "image_url", image_url: { url: activeImage } }
-                        ]
-                    });
-                } else {
-                    apiMessages.push({ role: "user", content: activeMessage });
-                }
-
                 const response = await fetch('https://text.pollinations.ai/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        messages: apiMessages,
-                        model: "p1", // FIX: Menggunakan model P1 asli bawaan Pollinations yang support parsing Base64 Vision
+                        messages: [
+                            { role: "system", content: SYSTEM_PROMPT },
+                            { role: "user", content: message }
+                        ],
+                        model: "openai", 
                         jsonMode: false
                     })
                 });
 
-                if (!response.ok) throw new Error('API Error');
+                if (!response.ok) throw new Error('API Exception Error');
 
                 const data = await response.text();
                 updateBotMessage(botMessageId, data);
@@ -227,22 +173,12 @@ Always tell the user to use 'config.json' for private keys instead of hardcoding
             }
         });
 
-        function appendMessage(sender, text, imageBase64 = "") {
+        function appendMessage(sender, text) {
             const id = 'msg-' + Date.now();
             const msgDiv = document.createElement('div');
             const isUser = sender === 'user';
             
             msgDiv.className = `flex gap-4 items-start message-fade-in ${isUser ? 'justify-end' : ''}`;
-            
-            let messageContentHTML = "";
-            if (imageBase64) {
-                messageContentHTML += `<img src="${imageBase64}" class="max-w-[180px] rounded-xl border border-slate-800 shadow-xl block mb-2">`;
-            }
-            if (text) {
-                messageContentHTML += isUser ? escapeHTML(text) : text;
-            } else if (!text && isUser && imageBase64) {
-                messageContentHTML += `<span class="text-xs text-slate-500 italic">Mengirim berkas foto...</span>`;
-            }
 
             msgDiv.innerHTML = `
                 ${!isUser ? `
@@ -251,7 +187,7 @@ Always tell the user to use 'config.json' for private keys instead of hardcoding
                     </div>
                 ` : ''}
                 <div id="${id}" class="${isUser ? 'bg-slate-900 border border-slate-800/80 rounded-xl px-4 py-2.5 max-w-[85%] text-sm text-slate-200' : 'flex-1 text-sm text-slate-300 leading-relaxed prose pl-3 border-l-2 border-purple-500/40 overflow-hidden'}">
-                    ${messageContentHTML}
+                    ${isUser ? escapeHTML(text) : text}
                 </div>
             `;
             
@@ -344,7 +280,6 @@ Always tell the user to use 'config.json' for private keys instead of hardcoding
         function setLoading(isLoading) {
             userInput.disabled = isLoading;
             sendBtn.disabled = isLoading;
-            attachBtn.disabled = isLoading;
             if(!isLoading) {
                 userInput.focus();
             }
@@ -356,4 +291,4 @@ Always tell the user to use 'config.json' for private keys instead of hardcoding
         }
     </script>
 </body>
-                </html>
+</html>
