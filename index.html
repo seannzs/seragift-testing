@@ -282,4 +282,75 @@ Always prompt the user to use 'config.json' for private keys instead of hardcodi
                             <i class="fa-regular fa-copy text-[10px]"></i> <span>Copy</span>
                         </button>
                         <button onclick="downloadCodeFile(this, '${detectedLang}')" class="hover:text-purple-400 transition-colors flex items-center gap-1 cursor-pointer">
-                            <i class="fa-solid fa-arrow-down-to-line text-[10px]"></i>
+                            <i class="fa-solid fa-arrow-down-to-line text-[10px]"></i> <span>Download</span>
+                        </button>
+                    </div>
+                `;
+
+                preElement.parentNode.insertBefore(wrapper, preElement);
+                wrapper.appendChild(topBar);
+                wrapper.appendChild(preElement);
+            });
+
+            container.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+
+            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.copyCodeToClipboard = function(buttonElement) {
+            const preBlock = buttonElement.closest('.group\\/code').querySelector('pre');
+            const actualCode = preBlock.textContent;
+
+            navigator.clipboard.writeText(actualCode).then(() => {
+                const span = buttonElement.querySelector('span');
+                const icon = buttonElement.querySelector('i');
+                span.textContent = "Copied!";
+                icon.className = "fa-solid fa-check text-[10px] text-emerald-400";
+                setTimeout(() => {
+                    span.textContent = "Copy";
+                    icon.className = "fa-regular fa-copy text-[10px]";
+                }, 2000);
+            });
+        };
+
+        window.downloadCodeFile = function(buttonElement, language) {
+            const preBlock = buttonElement.closest('.group\\/code').querySelector('pre');
+            const actualCode = preBlock.textContent;
+
+            let ext = "txt";
+            const langLower = language.toLowerCase();
+            if (langLower.includes("js") || langLower.includes("javascript")) ext = "js";
+            else if (langLower.includes("json")) ext = "json";
+            else if (langLower.includes("py") || langLower.includes("python")) ext = "py";
+            else if (langLower.includes("html")) ext = "html";
+            else if (langLower.includes("css")) ext = "css";
+
+            const blob = new Blob([actualCode], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `script_${Date.now()}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        function setLoading(isLoading) {
+            userInput.disabled = isLoading;
+            sendBtn.disabled = isLoading;
+            attachBtn.disabled = isLoading;
+            if(!isLoading) {
+                userInput.focus();
+            }
+        }
+
+        function escapeHTML(str) {
+            if(str.includes('animate-spin') || str.includes('text-rose-400')) return str;
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+    </script>
+</body>
+                        </html>
