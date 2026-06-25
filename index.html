@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Nexsus Assistant — Intelligent Programming & Cyber Security Assistant</title>
+<meta name="description" content="Nexsus Assistant, AI chat untuk programming dan cyber security, didukung Pollinations.ai">
+
+<style>
+/* ============================================================
+   NEXSUS ASSISTANT — DESIGN TOKENS
+   Background  #050816   Primary #00D4FF
+   Secondary   #7C3AED   Accent  #00FFB3
+   ============================================================ */
+:root{
+  --bg:#050816;
+  --bg-elev-1:#080b1f;
+  --bg-elev-2:#0c1129;
+  --bg-elev-3:#10162f;
+  --border:#1b2140;
+  --border-soft:#151a33;
+  --primary:#00D4FF;
+  --secondary:#7C3AED;
+  --accent:#00FFB3;
+  --text-hi:#eef1fb;
+  --text-mid:#a6adc9;
+  --text-low:#6b7194;
+  --danger:#ff5d7a;
+  --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body:'Inter', 'Segoe UI', sans-serif;
+  --font-mono:'JetBrains Mono', 'Fira Code', monospace;
+  --radius-sm:8px;
+  --radius-md:14px;
+  --radius-lg:20px;
+  --ease:cubic-bezier(.16,.84,.44,1);
+}
+
+@font-face{
+  font-family:'Space Grotesk';
+  src:local('Space Grotesk');
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  font-size:15px;
+  line-height:1.55;
+}
+@font-face{font-family:'Inter';src:local('Inter');}
+
+::selection{background:rgba(0,212,255,.25);color:#fff;}
+
+a{color:var(--primary);text-decoration:none;}
+
+/* Scrollbar */
+*::-webkit-scrollbar{width:8px;height:8px;}
+*::-webkit-scrollbar-track{background:transparent;}
+*::-webkit-scrollbar-thumb{background:#202746;border-radius:8px;}
+*::-webkit-scrollbar-thumb:hover{background:#2b3258;}
+
+/* ============================================================
+   AMBIENT BACKGROUND — Aurora + Particles
+   ============================================================ */
+.ambient{
+  position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  background:var(--bg);
+}
+.aurora{
+  position:absolute;
+  width:140vmax; height:140vmax;
+  top:-60vmax; left:-30vmax;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(0,212,255,.16), transparent 38%),
+    radial-gradient(circle at 70% 60%, rgba(124,58,237,.18), transparent 40%),
+    radial-gradient(circle at 45% 80%, rgba(0,255,179,.10), transparent 35%);
+  filter:blur(60px) saturate(120%);
+  animation:auroraDrift 32s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes auroraDrift{
+  0%{transform:translate(0,0) rotate(0deg) scale(1);}
+  50%{transform:translate(4%,3%) rotate(8deg) scale(1.08);}
+  100%{transform:translate(-3%,-2%) rotate(-6deg) scale(1.02);}
+}
+.grid-overlay{
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:42px 42px;
+  mask-image:radial-gradient(ellipse 70% 60% at 50% 30%, #000 0%, transparent 75%);
+}
+.particles{position:absolute; inset:0;}
+.particle{
+  position:absolute;
+  width:3px;height:3px;
+  border-radius:50%;
+  background:var(--primary);
+  opacity:.5;
+  box-shadow:0 0 6px 1px currentColor;
+  animation:floaty linear infinite;
+}
+@keyframes floaty{
+  0%{transform:translateY(0) translateX(0);opacity:0;}
+  10%{opacity:.6;}
+  90%{opacity:.4;}
+  100%{transform:translateY(-110vh) translateX(20px);opacity:0;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .aurora{animation:none;}
+  .particle{animation:none;display:none;}
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app{
+  position:relative; z-index:1;
+  display:grid;
+  grid-template-columns:248px 1fr;
+  height:100vh;
+}
+
+/* ---------------- SIDEBAR ---------------- */
+.sidebar{
+  background:rgba(8,11,31,.6);
+  backdrop-filter:blur(20px);
+  border-right:1px solid var(--border-soft);
+  display:flex; flex-direction:column;
+  padding:22px 16px;
+  gap:28px;
+}
+.brand{
+  display:flex; align-items:center; gap:11px;
+  padding:4px 6px;
+}
+.brand-mark{
+  width:36px;height:36px;flex:0 0 36px;
+  border-radius:10px;
+  position:relative;
+  background:
+    conic-gradient(from 220deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset, 0 0 24px -6px var(--primary);
+}
+.brand-mark::after{
+  content:"";
+  position:absolute; inset:3px;
+  border-radius:8px;
+  background:var(--bg);
+}
+.brand-mark svg{position:relative;z-index:1;width:18px;height:18px;}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;}
+.brand-text strong{
+  font-family:var(--font-display);
+  font-size:15.5px;
+  font-weight:600;
+  letter-spacing:.2px;
+}
+.brand-text span{
+  font-size:11px;
+  color:var(--text-low);
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+
+.btn-newchat{
+  display:flex; align-items:center; justify-content:center; gap:9px;
+  width:100%;
+  padding:11px 14px;
+  border-radius:var(--radius-md);
+  background:linear-gradient(135deg, rgba(0,212,255,.12), rgba(124,58,237,.12));
+  border:1px solid rgba(0,212,255,.28);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:13.5px;
+  font-weight:560;
+  cursor:pointer;
+  transition:transform .22s var(--ease), border-color .22s, box-shadow .22s, background .22s;
+}
+.btn-newchat svg{width:16px;height:16px;flex:0 0 auto;color:var(--primary);}
+.btn-newchat:hover{
+  border-color:rgba(0,212,255,.55);
+  box-shadow:0 0 0 1px rgba(0,212,255,.15), 0 8px 24px -8px rgba(0,212,255,.35);
+  transform:translateY(-1px);
+}
+.btn-newchat:active{transform:translateY(0px) scale(.99);}
+
+.sidebar-footer{
+  margin-top:auto;
+  padding:10px 6px;
+  font-size:11.5px;
+  color:var(--text-low);
+  display:flex; flex-direction:column; gap:6px;
+}
+.sidebar-footer .ver-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  width:fit-content;
+  padding:4px 9px;
+  border-radius:20px;
+  background:var(--bg-elev-2);
+  border:1px solid var(--border);
+  font-size:10.5px;
+  color:var(--text-mid);
+  letter-spacing:.3px;
+}
+.ver-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
+
+/* ---------------- MAIN ---------------- */
+.main{
+  display:flex; flex-direction:column;
+  height:100vh;
+  position:relative;
+  min-width:0;
+}
+
+/* HEADER */
+.topbar{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 26px;
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(5,8,22,.55);
+  backdrop-filter:blur(16px);
+  z-index:5;
+}
+.topbar-left{display:flex; align-items:center; gap:12px;}
+.topbar-logo{
+  display:flex; align-items:center; gap:9px;
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:14.5px;
+  color:var(--text-hi);
+}
+.topbar-logo .glyph{
+  width:8px;height:8px;border-radius:2px;
+  background:var(--primary);
+  box-shadow:0 0 10px var(--primary);
+  transform:rotate(45deg);
+}
+.topbar-right{display:flex; align-items:center; gap:10px;}
+.status-pill{
+  display:flex; align-items:center; gap:7px;
+  padding:6px 12px;
+  border-radius:20px;
+  background:rgba(0,255,179,.07);
+  border:1px solid rgba(0,255,179,.25);
+  font-size:12px;
+  color:#9bfdd9;
+  font-weight:500;
+}
+.status-pill .pulse{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--accent);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1; transform:scale(1);}
+  50%{opacity:.5; transform:scale(.78);}
+}
+.engine-pill{
+  display:flex; align-items:center; gap:7px;
+  padding:6px 12px;
+  border-radius:20px;
+  background:var(--bg-elev-2);
+  border:1px solid var(--border);
+  font-size:12px;
+  color:var(--text-mid);
+  font-weight:500;
+}
+.engine-pill b{color:var(--text-hi); font-weight:600;}
+.engine-pill .flower{color:var(--secondary); font-size:13px;}
+
+/* CHAT VIEWPORT */
+.viewport{
+  flex:1 1 auto;
+  overflow-y:auto;
+  position:relative;
+  scroll-behavior:smooth;
+}
+.viewport-inner{
+  max-width:780px;
+  margin:0 auto;
+  padding:32px 24px 160px;
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ---------------- LANDING SCREEN ---------------- */
+.landing{
+  flex:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center;
+  gap:10px;
+  padding:40px 0 10px;
+  animation:fadeUp .7s var(--ease) both;
+}
+.landing-mark{
+  width:64px;height:64px;
+  border-radius:18px;
+  margin-bottom:18px;
+  background:conic-gradient(from 220deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  box-shadow:0 0 60px -10px rgba(0,212,255,.45);
+  animation:floatMark 5s ease-in-out infinite;
+}
+.landing-mark::after{content:"";position:absolute;inset:4px;border-radius:14px;background:var(--bg);}
+.landing-mark svg{position:relative;z-index:1;width:30px;height:30px;}
+@keyframes floatMark{
+  0%,100%{transform:translateY(0px);}
+  50%{transform:translateY(-8px);}
+}
+.landing h1{
+  font-family:var(--font-display);
+  font-size:34px;
+  font-weight:600;
+  letter-spacing:-.02em;
+  background:linear-gradient(95deg, #fff 10%, var(--primary) 55%, var(--accent) 95%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.landing p.tagline{
+  color:var(--text-mid);
+  font-size:15.5px;
+  max-width:480px;
+  margin-top:2px;
+}
+
+.suggestions{
+  margin-top:34px;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:12px;
+  width:100%;
+  max-width:720px;
+}
+@media (max-width:760px){
+  .suggestions{grid-template-columns:repeat(2, minmax(0,1fr));}
+}
+.s-card{
+  display:flex; flex-direction:column; gap:8px;
+  text-align:left;
+  padding:15px 16px;
+  border-radius:var(--radius-md);
+  background:var(--bg-elev-2);
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:transform .25s var(--ease), border-color .25s, background .25s, box-shadow .25s;
+  animation:fadeUp .6s var(--ease) both;
+}
+.s-card:nth-child(1){animation-delay:.05s;}
+.s-card:nth-child(2){animation-delay:.1s;}
+.s-card:nth-child(3){animation-delay:.15s;}
+.s-card:nth-child(4){animation-delay:.2s;}
+.s-card:nth-child(5){animation-delay:.25s;}
+.s-card:nth-child(6){animation-delay:.3s;}
+.s-card:nth-child(7){animation-delay:.35s;}
+.s-card:nth-child(8){animation-delay:.4s;}
+.s-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(0,212,255,.4);
+  background:var(--bg-elev-3);
+  box-shadow:0 14px 30px -14px rgba(0,212,255,.25);
+}
+.s-card .icon{
+  width:30px;height:30px;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,212,255,.08);
+  color:var(--primary);
+  flex:0 0 auto;
+}
+.s-card .icon svg{width:16px;height:16px;}
+.s-card[data-cat="security"] .icon{background:rgba(124,58,237,.12); color:#b794f6;}
+.s-card[data-cat="accent"] .icon{background:rgba(0,255,179,.1); color:var(--accent);}
+.s-card .title{font-size:13.5px; font-weight:600; color:var(--text-hi);}
+.s-card .sub{font-size:11.5px; color:var(--text-low);}
+
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(14px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* ---------------- MESSAGES ---------------- */
+.thread{display:flex; flex-direction:column; gap:22px;}
+.msg{
+  display:flex; gap:13px;
+  animation:msgReveal .42s var(--ease) both;
+}
+@keyframes msgReveal{
+  from{opacity:0; transform:translateY(10px) scale(.992);}
+  to{opacity:1; transform:translateY(0) scale(1);}
+}
+.msg-avatar{
+  width:30px;height:30px;flex:0 0 30px;
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.msg.user .msg-avatar{
+  background:var(--bg-elev-3);
+  border:1px solid var(--border);
+  color:var(--text-mid);
+}
+.msg.assistant .msg-avatar{
+  background:conic-gradient(from 220deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+  position:relative;
+  box-shadow:0 0 18px -4px var(--primary);
+}
+.msg.assistant .msg-avatar::after{content:"";position:absolute;inset:2.5px;border-radius:7px;background:var(--bg);}
+.msg.assistant .msg-avatar svg{position:relative;z-index:1;width:15px;height:15px;}
+.msg-avatar svg{width:14px;height:14px;}
+
+.msg-body{flex:1; min-width:0; padding-top:3px;}
+.msg-name{
+  font-size:12px; font-weight:600;
+  color:var(--text-mid);
+  margin-bottom:5px;
+  display:flex; align-items:center; gap:7px;
+}
+.msg.assistant .msg-name{color:#8fe9ff;}
+.msg-name .tag{
+  font-size:9.5px; font-weight:600;
+  padding:1.5px 6px; border-radius:5px;
+  background:rgba(0,212,255,.1); color:var(--primary);
+  letter-spacing:.4px;
+}
+
+.msg-content{
+  font-size:14.8px;
+  color:var(--text-hi);
+  line-height:1.68;
+}
+.msg-content p{margin:0 0 10px;}
+.msg-content p:last-child{margin-bottom:0;}
+.msg-content ul, .msg-content ol{margin:8px 0 12px; padding-left:22px;}
+.msg-content li{margin-bottom:5px;}
+.msg-content h1,.msg-content h2,.msg-content h3{
+  font-family:var(--font-display); font-weight:600;
+  margin:18px 0 8px; color:#fff; line-height:1.3;
+}
+.msg-content h1{font-size:19px;}
+.msg-content h2{font-size:17px;}
+.msg-content h3{font-size:15px;}
+.msg-content strong{color:#fff; font-weight:600;}
+.msg-content a{border-bottom:1px solid rgba(0,212,255,.35);}
+.msg-content blockquote{
+  border-left:2px solid var(--secondary);
+  padding:2px 14px;
+  color:var(--text-mid);
+  margin:10px 0;
+}
+.msg-content code:not(pre code){
+  background:rgba(0,212,255,.1);
+  color:#8fe9ff;
+  padding:2px 6px;
+  border-radius:5px;
+  font-family:var(--font-mono);
+  font-size:13px;
+}
+.msg-content table{
+  width:100%; border-collapse:collapse; margin:12px 0;
+  font-size:13.5px;
+}
+.msg-content th,.msg-content td{
+  border:1px solid var(--border); padding:7px 10px; text-align:left;
+}
+.msg-content th{background:var(--bg-elev-2); color:var(--text-hi);}
+
+/* CODE BLOCKS */
+.code-block{
+  margin:12px 0;
+  border-radius:var(--radius-md);
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:#080b1a;
+  box-shadow:0 10px 28px -14px rgba(0,0,0,.6);
+}
+.code-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px;
+  background:var(--bg-elev-2);
+  border-bottom:1px solid var(--border);
+}
+.code-lang{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  color:var(--text-low);
+  text-transform:lowercase;
+  letter-spacing:.4px;
+  display:flex; align-items:center; gap:7px;
+}
+.code-lang .lang-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);}
+.copy-btn{
+  display:flex; align-items:center; gap:6px;
+  font-size:11.5px;
+  color:var(--text-mid);
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:4px 9px;
+  cursor:pointer;
+  font-family:var(--font-body);
+  transition:all .2s var(--ease);
+}
+.copy-btn svg{width:12px;height:12px;}
+.copy-btn:hover{border-color:var(--primary); color:var(--primary); background:rgba(0,212,255,.06);}
+.copy-btn.copied{border-color:var(--accent); color:var(--accent);}
+.code-block pre{
+  margin:0; padding:14px 16px;
+  overflow-x:auto;
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.6;
+}
+.code-block code{font-family:var(--font-mono); white-space:pre;}
+
+/* minimal syntax highlight */
+.tok-kw{color:#c792ea;}
+.tok-str{color:#9bfdd9;}
+.tok-com{color:#5b6280; font-style:italic;}
+.tok-fn{color:#82aaff;}
+.tok-num{color:#f78c6c;}
+.tok-prop{color:#80cbc4;}
+.tok-tag{color:#ff8fa3;}
+.tok-punc{color:#7d86b3;}
+
+/* TYPING INDICATOR */
+.typing-row{display:flex; gap:13px; animation:msgReveal .3s var(--ease) both;}
+.typing-dots{
+  display:flex; align-items:center; gap:4px;
+  padding:10px 14px;
+  background:var(--bg-elev-2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  width:fit-content;
+  margin-top:3px;
+}
+.typing-dots span{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--primary);
+  animation:typingBounce 1.1s ease-in-out infinite;
+}
+.typing-dots span:nth-child(2){animation-delay:.15s;}
+.typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes typingBounce{
+  0%,60%,100%{transform:translateY(0); opacity:.5;}
+  30%{transform:translateY(-4px); opacity:1;}
+}
+
+/* Notice (unsupported feature) */
+.sys-notice{
+  display:flex; gap:11px; align-items:flex-start;
+  padding:13px 15px;
+  border-radius:var(--radius-md);
+  background:rgba(124,58,237,.08);
+  border:1px solid rgba(124,58,237,.3);
+  font-size:13.5px;
+  color:#d9c9ff;
+  animation:msgReveal .4s var(--ease) both;
+}
+.sys-notice svg{width:17px;height:17px;flex:0 0 auto; color:#b794f6; margin-top:1px;}
+
+/* ---------------- INPUT AREA ---------------- */
+.composer-wrap{
+  flex:0 0 auto;
+  position:relative;
+  z-index:4;
+  padding:16px 24px 20px;
+  background:linear-gradient(to top, var(--bg) 55%, transparent);
+}
+.composer{
+  max-width:780px;
+  margin:0 auto;
+}
+.composer-box{
+  display:flex; align-items:flex-end; gap:10px;
+  background:var(--bg-elev-2);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:10px 10px 10px 18px;
+  box-shadow:0 14px 40px -18px rgba(0,0,0,.7);
+  transition:border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.composer-box:focus-within{
+  border-color:rgba(0,212,255,.5);
+  box-shadow:0 0 0 1px rgba(0,212,255,.18), 0 16px 44px -16px rgba(0,212,255,.25);
+}
+#composerInput{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  resize:none;
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:14.5px;
+  line-height:1.5;
+  max-height:200px;
+  min-height:24px;
+  padding:8px 0;
+}
+#composerInput::placeholder{color:var(--text-low);}
+
+.send-btn{
+  width:40px;height:40px; flex:0 0 40px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--primary), var(--secondary));
+  color:#05060f;
+  transition:transform .2s var(--ease), opacity .2s, box-shadow .2s;
+  box-shadow:0 8px 20px -8px rgba(0,212,255,.5);
+}
+.send-btn svg{width:17px;height:17px;}
+.send-btn:hover{transform:translateY(-1px) scale(1.03); box-shadow:0 10px 26px -8px rgba(0,212,255,.65);}
+.send-btn:active{transform:translateY(0) scale(.96);}
+.send-btn:disabled{opacity:.35; cursor:not-allowed; box-shadow:none; transform:none;}
+.send-btn.stop{background:linear-gradient(135deg, var(--danger), #ff8a65);}
+
+.composer-hint{
+  display:flex; justify-content:center; gap:14px;
+  margin-top:9px;
+  font-size:11px;
+  color:var(--text-low);
+}
+.composer-hint kbd{
+  font-family:var(--font-mono);
+  background:var(--bg-elev-3);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:1px 5px;
+  font-size:10px;
+  color:var(--text-mid);
+}
+
+/* Glow accent line under composer on focus */
+.composer-box .glow-edge{
+  position:absolute; pointer-events:none;
+}
+
+/* Scroll-to-bottom button */
+.scroll-bottom-btn{
+  position:absolute;
+  bottom:104px; right:28px;
+  width:38px;height:38px;
+  border-radius:50%;
+  background:var(--bg-elev-3);
+  border:1px solid var(--border);
+  color:var(--text-mid);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  opacity:0; pointer-events:none;
+  transition:opacity .25s var(--ease), transform .25s var(--ease), border-color .2s;
+  z-index:6;
+}
+.scroll-bottom-btn.show{opacity:1; pointer-events:auto;}
+.scroll-bottom-btn:hover{border-color:var(--primary); color:var(--primary); transform:translateY(-2px);}
+.scroll-bottom-btn svg{width:16px;height:16px;}
+
+/* Responsive */
+@media (max-width:880px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{
+    position:fixed; top:0; left:0; height:100vh; width:248px;
+    transform:translateX(-100%);
+    transition:transform .3s var(--ease);
+    z-index:50;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .menu-toggle{display:flex !important;}
+  .landing h1{font-size:27px;}
+  .suggestions{grid-template-columns:repeat(2,1fr);}
+}
+.menu-toggle{
+  display:none;
+  width:34px;height:34px;
+  align-items:center;justify-content:center;
+  border-radius:9px;
+  border:1px solid var(--border);
+  background:var(--bg-elev-2);
+  color:var(--text-mid);
+  cursor:pointer;
+}
+.menu-toggle svg{width:16px;height:16px;}
+.sidebar-overlay{
+  display:none;
+  position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:40;
+}
+.sidebar-overlay.show{display:block;}
+
+@media (max-width:520px){
+  .topbar{padding:12px 14px;}
+  .engine-pill span.full{display:none;}
+  .viewport-inner{padding:20px 14px 150px;}
+  .composer-wrap{padding:12px 12px 16px;}
+  .landing-mark{width:54px;height:54px;}
+  .landing h1{font-size:23px;}
+  .landing p.tagline{font-size:13.5px; padding:0 10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= AMBIENT BACKGROUND ================= -->
+<div class="ambient">
+  <div class="aurora"></div>
+  <div class="grid-overlay"></div>
+  <div class="particles" id="particles"></div>
+</div>
+
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" stroke="#050816" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 2v20M4 7l8 5 8-5" stroke="#050816" stroke-width="1.6"/></svg>
+      </div>
+      <div class="brand-text">
+        <strong>Nexsus</strong>
+        <span>Assistant</span>
+      </div>
+    </div>
+
+    <button class="btn-newchat" id="newChatBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      New Chat
+    </button>
+
+    <div class="sidebar-footer">
+      <span class="ver-pill"><span class="dot"></span> v1.0 · Text Chat</span>
+      <span>© 2026 Nexsus Assistant</span>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="topbar-logo">
+          <span class="glyph"></span>
+          Nexsus Assistant
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="status-pill"><span class="pulse"></span> Online</span>
+        <span class="engine-pill"><span class="flower">✤</span> <span class="full">Powered by</span> <b>Pollinations.ai</b></span>
+      </div>
+    </header>
+
+    <!-- CHAT VIEWPORT -->
+    <div class="viewport" id="viewport">
+      <div class="viewport-inner" id="viewportInner">
+
+        <!-- LANDING SCREEN -->
+        <section class="landing" id="landing">
+          <div class="landing-mark">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" stroke="#050816" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 2v20M4 7l8 5 8-5" stroke="#050816" stroke-width="1.5"/></svg>
+          </div>
+          <h1>Nexsus Assistant</h1>
+          <p class="tagline">"Your Intelligent Programming & Cyber Security Assistant"</p>
+
+          <div class="suggestions" id="suggestions">
+            <button class="s-card" data-cat="primary" data-prompt="Generate kode lengkap untuk ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div>
+              <div class="title">Generate Code</div>
+              <div class="sub">Buat kode dari deskripsi</div>
+            </button>
+
+            <button class="s-card" data-cat="accent" data-prompt="Tolong perbaiki bug pada kode berikut: ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg></div>
+              <div class="title">Fix Bug</div>
+              <div class="sub">Temukan & perbaiki error</div>
+            </button>
+
+            <button class="s-card" data-cat="primary" data-prompt="Jelaskan secara detail bagaimana kode berikut bekerja: ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 17v.01M12 13.5c0-2 2-2 2-4a2 2 0 10-4 0"/><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="title">Explain Code</div>
+              <div class="sub">Pahami logika program</div>
+            </button>
+
+            <button class="s-card" data-cat="security" data-prompt="Lakukan audit keamanan terhadap sistem/kode berikut: ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></div>
+              <div class="title">Security Audit</div>
+              <div class="sub">Analisis celah keamanan</div>
+            </button>
+
+            <button class="s-card" data-cat="primary" data-prompt="Bantu saya membangun REST API untuk ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></div>
+              <div class="title">Build REST API</div>
+              <div class="sub">Rancang endpoint backend</div>
+            </button>
+
+            <button class="s-card" data-cat="accent" data-prompt="Bantu saya membuat Discord bot dengan fitur ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M9 4l1.5 4M15 4l-1.5 4"/><circle cx="9" cy="13.5" r="1.2" fill="currentColor"/><circle cx="15" cy="13.5" r="1.2" fill="currentColor"/></svg></div>
+              <div class="title">Create Discord Bot</div>
+              <div class="sub">Bot custom dengan command</div>
+            </button>
+
+            <button class="s-card" data-cat="security" data-prompt="Jelaskan perintah Linux untuk ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg></div>
+              <div class="title">Linux Commands</div>
+              <div class="sub">Perintah & administrasi</div>
+            </button>
+
+            <button class="s-card" data-cat="primary" data-prompt="Bantu saya menulis query database untuk ">
+              <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
+              <div class="title">Database Query</div>
+              <div class="sub">SQL & optimasi data</div>
+            </button>
+          </div>
+        </section>
+
+        <!-- THREAD -->
+        <section class="thread" id="thread"></section>
+
+      </div>
+
+      <button class="scroll-bottom-btn" id="scrollBottomBtn" title="Scroll ke bawah">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </button>
+    </div>
+
+    <!-- INPUT AREA -->
+    <div class="composer-wrap">
+      <div class="composer">
+        <div class="composer-box">
+          <textarea id="composerInput" rows="1" placeholder="Tanyakan apa saja seputar programming, security, atau development..."></textarea>
+          <button class="send-btn" id="sendBtn" disabled title="Kirim pesan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14-7-7 14-2-7-5-2z"/></svg>
+          </button>
+        </div>
+        <div class="composer-hint">
+          <span><kbd>Enter</kbd> kirim</span>
+          <span><kbd>Shift</kbd>+<kbd>Enter</kbd> baris baru</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     CONFIG
+     ============================================================ */
+  const POLLINATIONS_ENDPOINT = "https://text.pollinations.ai/openai";
+  const POLLINATIONS_MODEL = "openai";
+
+  const SYSTEM_PROMPT = `Kamu adalah Nexsus Assistant, AI profesional yang ahli dalam:
+- Programming
+- Web Development
+- Backend Development
+- Cyber Security
+- Linux
+- DevOps
+- Networking
+- Database
+- Cloud Computing
+- API Development
+- Discord Bot Development
+- Framework Development
+
+Berikan jawaban yang akurat, detail, profesional, dan mudah dipahami. Gunakan format markdown yang rapi, termasuk code block dengan bahasa yang sesuai ketika relevan. Jawab dalam bahasa yang digunakan pengguna (Indonesia atau Inggris).
+
+PENTING: Versi ini (v1.0) hanya mendukung percakapan berbasis teks. Kamu tidak bisa menerima atau menganalisis file, gambar, audio, video, link/URL eksternal, atau melakukan scraping website. Jika pengguna meminta hal tersebut, beritahu dengan sopan bahwa fitur tersebut akan hadir di versi berikutnya.`;
+
+  const UNSUPPORTED_NOTICE = "Fitur analisis file, gambar, audio, video, dan website akan hadir pada versi berikutnya. Saat ini Nexsus Assistant hanya mendukung percakapan berbasis teks.";
+
+  /* ============================================================
+     STATE
+     ============================================================ */
+  let conversation = []; // {role, content}
+  let isGenerating = false;
+  let abortController = null;
+
+  /* ============================================================
+     DOM REFS
+     ============================================================ */
+  const $ = (id) => document.getElementById(id);
+  const viewport = $('viewport');
+  const viewportInner = $('viewportInner');
+  const landing = $('landing');
+  const thread = $('thread');
+  const composerInput = $('composerInput');
+  const sendBtn = $('sendBtn');
+  const newChatBtn = $('newChatBtn');
+  const scrollBottomBtn = $('scrollBottomBtn');
+  const suggestions = $('suggestions');
+  const sidebar = $('sidebar');
+  const sidebarOverlay = $('sidebarOverlay');
+  const menuToggle = $('menuToggle');
+
+  /* ============================================================
+     PARTICLES (ambient floating dots)
+     ============================================================ */
+  function buildParticles(){
+    const container = $('particles');
+    const count = window.innerWidth < 640 ? 14 : 26;
+    const colors = ['#00D4FF', '#7C3AED', '#00FFB3'];
+    let html = '';
+    for(let i=0;i<count;i++){
+      const left = Math.random()*100;
+      const size = 1.5 + Math.random()*2.5;
+      const dur = 14 + Math.random()*18;
+      const delay = Math.random()*-30;
+      const color = colors[Math.floor(Math.random()*colors.length)];
+      html += `<div class="particle" style="left:${left}%; bottom:-10px; width:${size}px; height:${size}px; color:${color}; animation-duration:${dur}s; animation-delay:${delay}s;"></div>`;
+    }
+    container.innerHTML = html;
+  }
+  buildParticles();
+
+  /* ============================================================
+     MOBILE SIDEBAR
+     ============================================================ */
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('show');
+  });
+  sidebarOverlay.addEventListener('click', closeSidebar);
+  function closeSidebar(){
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
+  }
+
+  /* ============================================================
+     TEXTAREA AUTO RESIZE
+     ============================================================ */
+  function autoResize(){
+    composerInput.style.height = 'auto';
+    const newHeight = Math.min(composerInput.scrollHeight, 200);
+    composerInput.style.height = newHeight + 'px';
+  }
+  composerInput.addEventListener('input', () => {
+    autoResize();
+    sendBtn.disabled = composerInput.value.trim().length === 0 || isGenerating;
+  });
+  composerInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      handleSend();
+    }
+  });
+
+  /* ============================================================
+     SUGGESTION CARDS
+     ============================================================ */
+  suggestions.addEventListener('click', (e) => {
+    const card = e.target.closest('.s-card');
+    if(!card) return;
+    const prompt = card.getAttribute('data-prompt') || '';
+    composerInput.value = prompt;
+    composerInput.focus();
+    autoResize();
+    sendBtn.disabled = prompt.trim().length === 0;
+    // place cursor at end
+    composerInput.setSelectionRange(prompt.length, prompt.length);
+  });
+
+  /* ============================================================
+     NEW CHAT
+     ============================================================ */
+  newChatBtn.addEventListener('click', startNewChat);
+  function startNewChat(){
+    if(isGenerating && abortController) abortController.abort();
+    isGenerating = false;
+    conversation = [];
+    thread.innerHTML = '';
+    landing.style.display = 'flex';
+    composerInput.value = '';
+    autoResize();
+    sendBtn.disabled = true;
+    sendBtn.classList.remove('stop');
+    closeSidebar();
+  }
+
+  /* ============================================================
+     SCROLL HANDLING
+     ============================================================ */
+  function scrollToBottom(smooth){
+    viewport.scrollTo({top: viewport.scrollHeight, behavior: smooth ? 'smooth' : 'auto'});
+  }
+  viewport.addEventListener('scroll', () => {
+    const distanceFromBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+    scrollBottomBtn.classList.toggle('show', distanceFromBottom > 220);
+  });
+  scrollBottomBtn.addEventListener('click', () => scrollToBottom(true));
+
+  /* ============================================================
+     UNSUPPORTED CONTENT DETECTION
+     Mendeteksi: URL/link, atau penyebutan upload file/gambar/audio/video
+     ============================================================ */
+  const URL_REGEX = /(https?:\/\/[^\s]+|www\.[^\s]+\.[a-z]{2,})/i;
+  const FILE_EXT_REGEX = /\.(jpg|jpeg|png|gif|webp|bmp|svg|mp3|wav|ogg|mp4|mov|avi|mkv|pdf|docx?|xlsx?|pptx?|zip|rar)\b/i;
+
+  function containsUnsupportedContent(text){
+    return URL_REGEX.test(text) || FILE_EXT_REGEX.test(text);
+  }
+
+  /* ============================================================
+     SEND HANDLER
+     ============================================================ */
+  sendBtn.addEventListener('click', handleSend);
+
+  function handleSend(){
+    if(isGenerating){
+      // act as stop button
+      if(abortController) abortController.abort();
+      return;
+    }
+    const text = composerInput.value.trim();
+    if(!text) return;
+
+    landing.style.display = 'none';
+
+    appendUserMessage(text);
+    conversation.push({role:'user', content:text});
+
+    composerInput.value = '';
+    autoResize();
+    sendBtn.disabled = true;
+
+    if(containsUnsupportedContent(text)){
+      appendSystemNotice();
+      scrollToBottom(true);
+      // still let it proceed conversationally below, since system prompt instructs model to handle gracefully too
+    }
+
+    requestAssistantReply();
+  }
+
+  /* ============================================================
+     RENDER: USER MESSAGE
+     ============================================================ */
+  function appendUserMessage(text){
+    const row = document.createElement('div');
+    row.className = 'msg user';
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+      </div>
+      <div class="msg-body">
+        <div class="msg-name">Anda</div>
+        <div class="msg-content"></div>
+      </div>`;
+    row.querySelector('.msg-content').textContent = text;
+    thread.appendChild(row);
+    scrollToBottom(true);
+  }
+
+  /* ============================================================
+     RENDER: SYSTEM NOTICE (unsupported feature)
+     ============================================================ */
+  function appendSystemNotice(){
+    const row = document.createElement('div');
+    row.className = 'sys-notice';
+    row.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>${UNSUPPORTED_NOTICE}</span>`;
+    thread.appendChild(row);
+  }
+
+  /* ============================================================
+     RENDER: TYPING INDICATOR
+     ============================================================ */
+  function appendTypingIndicator(){
+    const row = document.createElement('div');
+    row.className = 'typing-row';
+    row.id = 'typingRow';
+    row.innerHTML = `
+      <div class="msg-avatar" style="background:conic-gradient(from 220deg, var(--primary), var(--secondary), var(--accent), var(--primary)); position:relative; box-shadow:0 0 18px -4px var(--primary);">
+        <div style="position:absolute;inset:2.5px;border-radius:7px;background:var(--bg);"></div>
+        <svg style="position:relative;z-index:1;" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" stroke="#00D4FF" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="typing-dots"><span></span><span></span><span></span></div>`;
+    thread.appendChild(row);
+    scrollToBottom(true);
+  }
+  function removeTypingIndicator(){
+    const row = $('typingRow');
+    if(row) row.remove();
+  }
+
+  /* ============================================================
+     RENDER: ASSISTANT MESSAGE SHELL
+     ============================================================ */
+  function appendAssistantShell(){
+    const row = document.createElement('div');
+    row.className = 'msg assistant';
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" stroke="#050816" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="msg-body">
+        <div class="msg-name">Nexsus <span class="tag">AI</span></div>
+        <div class="msg-content"></div>
+      </div>`;
+    thread.appendChild(row);
+    return row.querySelector('.msg-content');
+  }
+
+  /* ============================================================
+     ERROR MESSAGE
+     ============================================================ */
+  function appendErrorMessage(message){
+    const contentEl = appendAssistantShell();
+    contentEl.innerHTML = `<p style="color:#ff9eb0;">⚠️ ${escapeHtml(message)}</p>`;
+    scrollToBottom(true);
+  }
+
+  /* ============================================================
+     MARKDOWN RENDERER (lightweight, safe)
+     Mendukung: heading, bold, italic, inline code, code block,
+     list, blockquote, link, paragraph
+     ============================================================ */
+  function escapeHtml(str){
+    return str
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function highlightCode(code, lang){
+    let escaped = escapeHtml(code);
+    if(!lang) return escaped;
+
+    const rules = {
+      keywords: /\b(function|const|let|var|return|if|else|for|while|class|import|export|from|async|await|new|try|catch|finally|switch|case|break|continue|default|extends|public|private|static|void|int|string|bool|def|self|None|True|False|elif|pass|lambda|with|as|in|is|not|and|or|null|undefined|this|super|interface|type|enum|package|use|fn|impl|struct|trait|mod|pub|match)\b/g,
+      strings: /(['"`])((?:\\.|(?!\1).)*)\1/g,
+      comments: /(\/\/.*$|#.*$|\/\*[\s\S]*?\*\/)/gm,
+      numbers: /\b(\d+\.?\d*)\b/g,
+      functions: /\b([a-zA-Z_]\w*)(?=\()/g,
+    };
+
+    let codeStr = escaped;
+    const placeholders = [];
+    function stash(html){
+      placeholders.push(html);
+      return `\u0000${placeholders.length-1}\u0000`;
+    }
+    codeStr = codeStr.replace(rules.comments, m => stash(`<span class="tok-com">${m}</span>`));
+    codeStr = codeStr.replace(rules.strings, m => stash(`<span class="tok-str">${m}</span>`));
+    codeStr = codeStr.replace(rules.keywords, m => stash(`<span class="tok-kw">${m}</span>`));
+    codeStr = codeStr.replace(rules.numbers, m => stash(`<span class="tok-num">${m}</span>`));
+    codeStr = codeStr.replace(rules.functions, m => stash(`<span class="tok-fn">${m}</span>`));
+    codeStr = codeStr.replace(/\u0000(\d+)\u0000/g, (_, i) => placeholders[i]);
+    return codeStr;
+  }
+
+  function renderMarkdown(raw){
+    // Extract code blocks first to protect them from other rules
+    const codeBlocks = [];
+    let text = raw.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+      codeBlocks.push({lang: lang || 'text', code: code.replace(/\n$/,'')});
+      return `\u0001CODEBLOCK${codeBlocks.length-1}\u0001`;
+    });
+
+    // Escape remaining HTML
+    text = escapeHtml(text);
+
+    // Inline code (after escaping, before other inline rules)
+    const inlineCodes = [];
+    text = text.replace(/`([^`\n]+)`/g, (m, code) => {
+      inlineCodes.push(code);
+      return `\u0002INLINECODE${inlineCodes.length-1}\u0002`;
+    });
+
+    // Headings
+    text = text.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+    text = text.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+    text = text.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+
+    // Bold / italic
+    text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+    // Blockquote
+    text = text.replace(/^&gt; ?(.*)$/gm, '<blockquote>$1</blockquote>');
+
+    // Links [text](url)
+    text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+    // Lists: group consecutive list lines
+    const lines = text.split('\n');
+    let html = '';
+    let inUl = false, inOl = false, inPara = false;
+
+    function closeLists(){
+      if(inUl){ html += '</ul>'; inUl = false; }
+      if(inOl){ html += '</ol>'; inOl = false; }
+    }
+    function closePara(){
+      if(inPara){ html += '</p>'; inPara = false; }
+    }
+
+    for(let line of lines){
+      const trimmed = line.trim();
+      if(trimmed === ''){
+        closeLists(); closePara();
+        continue;
+      }
+      if(/^<h[123]>/.test(trimmed) || /^<blockquote>/.test(trimmed)){
+        closeLists(); closePara();
+        html += trimmed;
+        continue;
+      }
+      const ulMatch = trimmed.match(/^[-*]\s+(.*)/);
+      const olMatch = trimmed.match(/^\d+\.\s+(.*)/);
+      if(ulMatch){
+        closePara();
+        if(inOl){ html += '</ol>'; inOl = false; }
+        if(!inUl){ html += '<ul>'; inUl = true; }
+        html += `<li>${ulMatch[1]}</li>`;
+        continue;
+      }
+      if(olMatch){
+        closePara();
+        if(inUl){ html += '</ul>'; inUl = false; }
+        if(!inOl){ html += '<ol>'; inOl = true; }
+        html += `<li>${olMatch[1]}</li>`;
+        continue;
+      }
+      closeLists();
+      if(/^\u0001CODEBLOCK\d+\u0001$/.test(trimmed)){
+        closePara();
+        html += trimmed;
+        continue;
+      }
+      if(!inPara){ html += '<p>'; inPara = true; } else { html += '<br>'; }
+      html += line;
+    }
+    closeLists(); closePara();
+
+    // Restore inline code
+    html = html.replace(/\u0002INLINECODE(\d+)\u0002/g, (_, i) => {
+      return `<code>${inlineCodes[Number(i)]}</code>`;
+    });
+
+    // Restore code blocks as styled HTML
+    html = html.replace(/\u0001CODEBLOCK(\d+)\u0001/g, (_, i) => {
+      const block = codeBlocks[Number(i)];
+      const highlighted = highlightCode(block.code, block.lang);
+      const blockId = 'cb_' + Math.random().toString(36).slice(2,9);
+      return `<div class="code-block">
+        <div class="code-head">
+          <span class="code-lang"><span class="lang-dot"></span>${escapeHtml(block.lang || 'text')}</span>
+          <button class="copy-btn" data-target="${blockId}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>
+            <span>Copy</span>
+          </button>
+        </div>
+        <pre><code id="${blockId}" data-raw="${encodeURIComponent(block.code)}">${highlighted}</code></pre>
+      </div>`;
+    });
+
+    return html;
+  }
+
+  /* Delegate copy button clicks */
+  thread.addEventListener('click', (e) => {
+    const btn = e.target.closest('.copy-btn');
+    if(!btn) return;
+    const targetId = btn.getAttribute('data-target');
+    const codeEl = document.getElementById(targetId);
+    if(!codeEl) return;
+    const raw = decodeURIComponent(codeEl.getAttribute('data-raw') || '');
+    navigator.clipboard.writeText(raw).then(() => {
+      btn.classList.add('copied');
+      const span = btn.querySelector('span');
+      const original = span.textContent;
+      span.textContent = 'Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        span.textContent = original;
+      }, 1800);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = raw;
+      document.body.appendChild(ta);
+      ta.select();
+      try{ document.execCommand('copy'); }catch(err){}
+      ta.remove();
+    });
+  });
+
+  /* ============================================================
+     STREAMING TEXT REVEAL (typewriter-ish for final render)
+     ============================================================ */
+  function revealContent(el, html){
+    el.innerHTML = html;
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(4px)';
+    requestAnimationFrame(() => {
+      el.style.transition = 'opacity .35s ease, transform .35s ease';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+  }
+
+  /* ============================================================
+     API CALL TO POLLINATIONS.AI
+     ============================================================ */
+  async function requestAssistantReply(){
+    isGenerating = true;
+    sendBtn.disabled = false;
+    sendBtn.classList.add('stop');
+    sendBtn.querySelector('svg').innerHTML = '<rect x="6" y="6" width="12" height="12" rx="2"/>';
+
+    appendTypingIndicator();
+    abortController = new AbortController();
+
+    const payload = {
+      model: POLLINATIONS_MODEL,
+      messages: [
+        {role:'system', content: SYSTEM_PROMPT},
+        ...conversation
+      ],
+      temperature: 0.7
+    };
+
+    try{
+      const res = await fetch(POLLINATIONS_ENDPOINT, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+        signal: abortController.signal
+      });
+
+      if(!res.ok){
+        throw new Error(`Server merespons dengan status ${res.status}`);
+      }
+
+      let replyText = '';
+      const contentType = res.headers.get('content-type') || '';
+
+      if(contentType.includes('application/json')){
+        const data = await res.json();
+        replyText = data?.choices?.[0]?.message?.content
+          ?? data?.choices?.[0]?.text
+          ?? data?.content
+          ?? '';
+      } else {
+        replyText = await res.text();
+      }
+
+      replyText = (replyText || '').trim();
+
+      if(!replyText){
+        throw new Error('Respons kosong dari AI engine');
+      }
+
+      removeTypingIndicator();
+      const contentEl = appendAssistantShell();
+      revealContent(contentEl, renderMarkdown(replyText));
+      conversation.push({role:'assistant', content: replyText});
+      scrollToBottom(true);
+
+    }catch(err){
+      removeTypingIndicator();
+      if(err.name === 'AbortError'){
+        appendErrorMessage('Generasi dihentikan oleh pengguna.');
+      } else {
+        appendErrorMessage(`Gagal terhubung ke Pollinations.ai. (${err.message || 'Unknown error'}) Silakan periksa koneksi internet Anda dan coba lagi.`);
+      }
+    } finally {
+      isGenerating = false;
+      sendBtn.classList.remove('stop');
+      sendBtn.querySelector('svg').innerHTML = '<path d="M5 12l14-7-7 14-2-7-5-2z"/>';
+      sendBtn.disabled = composerInput.value.trim().length === 0;
+      abortController = null;
+    }
+  }
+
+  /* ============================================================
+     INITIAL STATE
+     ============================================================ */
+  autoResize();
+  composerInput.focus();
+
+})();
+</script>
+</body>
+</html>
