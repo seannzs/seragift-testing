@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusDev.AI — Engine Pro v4.2</title>
+    <title>NexusDev.AI — Engine Pro v4.3</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +16,7 @@
         .no-scrollbar::-webkit-scrollbar { width: 4px; }
         .no-scrollbar::-webkit-scrollbar-thumb { background: #1e1b4b; border-radius: 10px; }
         
-        /* FIX: Pencegahan Kode Keluar Kotak (Force Word Wrap & Break Words) */
+        /* Pencegahan Kode Keluar Kotak (Force Word Wrap & Break Words) */
         pre, code {
             white-space: pre-wrap !important;
             word-wrap: break-word !important;
@@ -46,7 +46,7 @@
             <div class="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7] animate-pulse"></div>
             <div>
                 <span class="font-bold tracking-tight text-sm text-white">NexusDev<span class="text-purple-400">.AI</span></span>
-                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.2-media</span>
+                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.3-fixed</span>
             </div>
         </div>
         <div class="text-[10px] font-mono text-slate-400 bg-slate-900/40 px-2.5 py-1 rounded-md border border-slate-800/60 tracking-wider">
@@ -64,7 +64,7 @@
                 </div>
                 <div class="flex-1 space-y-2 text-sm text-slate-400 leading-relaxed">
                     <p class="font-mono text-xs text-slate-500 tracking-wider">WORKSPACE INITIALIZED.</p>
-                    <p>Halo, Sean. Ruang pengembangan bot, koding backend, dan analisis UI via unggah foto siap digunakan. Kirimkan gambar atau instruksi logika yang ingin kamu bangun.</p>
+                    <p>Halo, Sean. Ruang pengembangan bot, koding backend, dan analisis arsitektur via attachment foto siap digunakan. Lampirkan gambar atau instruksi logika yang ingin kamu bangun.</p>
                 </div>
             </div>
 
@@ -84,7 +84,7 @@
                     <input type="file" id="file-input" accept="image/*" class="hidden">
                     
                     <button type="button" id="attach-btn" class="h-9 w-9 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 flex items-center justify-center transition-all cursor-pointer shrink-0 mb-0.5 border border-slate-700/50">
-                        <i class="fa-regular fa-image text-sm"></i>
+                        <i class="fa-solid fa-paperclip text-sm"></i>
                     </button>
 
                     <textarea 
@@ -117,10 +117,10 @@
 
         let selectedImageBase64 = "";
 
-        // Triger klik input file lewat icon image
+        // Trigger file picker saat tombol klip attachment ditekan
         attachBtn.addEventListener('click', () => fileInput.click());
 
-        // Handle event ketika foto dipilih
+        // Konversi dan simpan gambar terpilih
         fileInput.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
@@ -128,14 +128,14 @@
                 reader.onload = function(e) {
                     selectedImageBase64 = e.target.result;
                     imagePreview.src = selectedImageBase64;
-                    imagePreviewContainer.style.display = 'flex'; // Munculkan preview kotak foto
-                    userInput.required = false; // Jika kirim gambar, teks boleh kosong
+                    imagePreviewContainer.style.display = 'flex';
+                    userInput.required = false; 
                 }
                 reader.readAsDataURL(file);
             }
         });
 
-        // Hapus attachment gambar
+        // Batal melampirkan gambar
         removeImageBtn.addEventListener('click', () => {
             selectedImageBase64 = "";
             fileInput.value = "";
@@ -143,7 +143,7 @@
             userInput.required = true;
         });
 
-        // Auto-resize textarea teks ke bawah pas ngetik panjang
+        // Auto-resize textarea ke bawah
         userInput.addEventListener('input', function() {
             this.style.height = '38px';
             this.style.height = (this.scrollHeight) + 'px';
@@ -203,14 +203,11 @@ When asked to build a discord bot core setup, write the code inside a file archi
             const message = userInput.value.trim();
             if (!message && !selectedImageBase64) return;
 
-            // Render bubble user chat ke interface
             appendMessage('user', message, selectedImageBase64);
             
-            // Backup asset data sebelum form di-clear
             const activeImage = selectedImageBase64;
             const activeMessage = message;
 
-            // Reset Form Input & Status UI
             userInput.value = '';
             userInput.style.height = '38px';
             selectedImageBase64 = "";
@@ -237,13 +234,11 @@ When asked to build a discord bot core setup, write the code inside a file archi
             }, 900);
 
             try {
-                // Membangun payload pesan untuk API Pollinations
                 let apiMessages = [
                     { role: "system", content: SYSTEM_PROMPT }
                 ];
 
                 if (activeImage) {
-                    // Masukkan multimodal format array jika mendeteksi payload gambar base64
                     apiMessages.push({
                         role: "user",
                         content: [
@@ -260,7 +255,7 @@ When asked to build a discord bot core setup, write the code inside a file archi
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         messages: apiMessages,
-                        model: "openai", // OpenAI model di Pollinations mendukung multimodal image input
+                        model: "openai", 
                         jsonMode: false
                     })
                 });
@@ -294,7 +289,7 @@ When asked to build a discord bot core setup, write the code inside a file archi
             if (text) {
                 messageContentHTML += isUser ? escapeHTML(text) : text;
             } else if (!text && isUser && imageBase64) {
-                messageContentHTML += `<span class="text-xs text-slate-500 italic">Mengirim gambar...</span>`;
+                messageContentHTML += `<span class="text-xs text-slate-500 italic">Mengirim lampiran...</span>`;
             }
 
             msgDiv.innerHTML = `
@@ -385,4 +380,16 @@ When asked to build a discord bot core setup, write the code inside a file archi
 
             const blob = new Blob([actualCode], { type: "text/plain;charset=utf-8" });
             const url = URL.createObjectURL(blob);
-         
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `script_${Date.now()}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        function setLoading(isLoading) {
+            userInput.disabled = isLoading;
+            sendBtn.disabled = isLoading;
+            attachBtn.disabled
