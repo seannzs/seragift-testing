@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusDev.AI — Engine Pro v4.6</title>
+    <title>NexusDev.AI — Engine Pro v4.7</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,13 +19,13 @@
         .no-scrollbar::-webkit-scrollbar-thumb { background: #1e1b4b; border-radius: 10px; }
         .no-scrollbar::-webkit-scrollbar-track { background: transparent; }
         
-        /* FIX TOTAL: Source Code Bisa Digeser Kanan-Kiri & Tidak Keluar Kotak */
+        /* FIX HORIZONTAL SCROLLBAR: Kode Bisa Digeser Kanan-Kiri & Tidak Keluar Kotak */
         .prose pre { 
             background: #070a13 !important; 
             padding: 1.25rem; 
             margin: 0px !important; 
-            overflow-x: auto !important; /* Mengaktifkan scroll horizontal */
-            white-space: pre !important; /* Menjaga susunan kode tetap horizontal */
+            overflow-x: auto !important; 
+            white-space: pre !important; 
             display: block;
             width: 100%;
         }
@@ -58,7 +58,7 @@
             <div class="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7] animate-pulse"></div>
             <div>
                 <span class="font-bold tracking-tight text-sm text-white">NexusDev<span class="text-purple-400">.AI</span></span>
-                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.6-multimodal</span>
+                <span class="text-[10px] text-slate-500 font-mono ml-2">v4.7-fixed-multimodal</span>
             </div>
         </div>
         <div class="text-[10px] font-mono text-slate-400 bg-slate-900/40 px-2.5 py-1 rounded-md border border-slate-800/60 tracking-wider">
@@ -76,7 +76,7 @@
                 </div>
                 <div class="flex-1 space-y-2 text-sm text-slate-400 leading-relaxed">
                     <p class="font-mono text-xs text-slate-500 tracking-wider">WORKSPACE INITIALIZED.</p>
-                    <p>Halo, Sean. Ruang pengembangan bot, analisis UI via foto, dan pengerjaan backend telah dioptimalkan secara mutlak. Silakan lampirkan gambar atau ketik instruksi logika sistem kodinganmu.</p>
+                    <p>Halo, Sean. Sistem interpretasi gambar dan perbaikan penanganan data teks media telah disinkronisasikan. Kirim tangkapan layar (screenshot) log error kodingan atau struktur database kamu untuk langsung dianalisis solusinya secara akurat.</p>
                 </div>
             </div>
 
@@ -166,9 +166,10 @@
         });
 
         const SYSTEM_PROMPT = `You are NexusDev.AI, an expert Fullstack Software Engineer. 
+When the user uploads an image containing an error code or logs, your primary task is to carefully analyze the image, pinpoint the technical cause of the failure, and provide the exact fixed source code immediately.
 Provide professional, clean, and highly modular source code for backend services, responsive websites, or Discord bot architectures (discord.js).
 Always guide the user to separate sensitive tokens inside a 'config.json' file instead of hardcoding them into the core logic file. 
-When asked to build a discord bot core setup, write the code inside a file architecture concept named 'merpati.js'. Speak in Indonesian language.`;
+When asked to build a discord bot core setup, write the code inside a file architecture concept named 'merpati.js'. Speak in Indonesian language. Ensure your answers focus directly on troubleshooting the provided log or instructions without falling back to generic placeholder templates.`;
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -188,7 +189,7 @@ When asked to build a discord bot core setup, write the code inside a file archi
             userInput.required = true;
             setLoading(true);
 
-            // FIX: Loading steps disederhanakan mutlak menjadi "Sedang berpikir..."
+            // Teks loading disederhanakan mutlak menjadi "Sedang berpikir..." untuk semua jenis pertanyaan
             const botMessageId = appendMessage('bot', `
                 <div class="flex items-center gap-2.5 text-slate-400 font-mono text-xs py-1">
                     <i class="fa-solid fa-circle-notch animate-spin text-purple-400"></i>
@@ -202,10 +203,11 @@ When asked to build a discord bot core setup, write the code inside a file archi
                 ];
 
                 if (activeImage) {
+                    // FIX RE-STRUCTURE: Memaksa teks pertanyaan masuk terlebih dahulu ke array content agar tidak ditimpa oleh parser gambar API
                     apiMessages.push({
                         role: "user",
                         content: [
-                            { type: "text", text: activeMessage || "Analisis gambar arsitektur / UI kodingan berikut." },
+                            { type: "text", text: activeMessage || "Analisis gambar log error kodingan berikut ini dan berikan perbaikan kodenya." },
                             { type: "image_url", image_url: { url: activeImage } }
                         ]
                     });
@@ -365,4 +367,4 @@ When asked to build a discord bot core setup, write the code inside a file archi
         }
     </script>
 </body>
-</html>
+    </html>
