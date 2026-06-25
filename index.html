@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexsus Assistant - Your Intelligent Coding & Cyber Security Companion</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg1: '#050816',
+                            bg2: '#0B1020',
+                            primary: '#00D4FF',
+                            secondary: '#7C3AED',
+                            accent: '#00FFB3',
+                            textMuted: '#B8C1D1'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base & Theme Styles */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(100% 100% at 50% 0%, #0B1020 0%, #050816 100%);
+            overflow-x: hidden;
+        }
+        
+        .light body {
+            background: radial-gradient(100% 100% at 50% 0%, #F4F7FA 0%, #E2E8F0 100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.5); }
+
+        /* Aurora & Grid Backgrounds */
+        .cyber-grid {
+            background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(25deg);
+            transform-origin: top;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+        }
+
+        .aurora {
+            filter: blur(100px);
+            opacity: 0.4;
+            mix-blend-mode: screen;
+            animation: aurora-float 12s infinite alternate ease-in-out;
+        }
+
+        @keyframes aurora-float {
+            0% { transform: translate(0px, 0px) scale(1); }
+            100% { transform: translate(30px, -50px) scale(1.2); }
+        }
+
+        /* Glassmorphism Core */
+        .glass {
+            background: rgba(11, 16, 32, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+        }
+
+        .light .glass {
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        /* Glow & Hover Animations */
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            border-color: #00D4FF;
+        }
+
+        /* Typing cursor */
+        .typing::after {
+            content: '|';
+            animation: blink 0.8s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col antialiased selection:bg-cyber-primary selection:text-cyber-bg1">
+
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute inset-x-0 top-0 h-[60vh] cyber-grid opacity-40"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyber-primary aurora"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-cyber-secondary aurora" style="animation-delay: -4s;"></div>
+        <canvas id="networkCanvas" class="absolute inset-0 opacity-20"></canvas>
+    </div>
+
+    <div id="landingScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-cyber-bg1 transition-all duration-1000 px-4">
+        <div class="text-center max-w-2xl transform translate-y-0 transition-all duration-700">
+            <div class="relative inline-block mb-6 group">
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-cyber-primary to-cyber-secondary blur-lg opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+                <div class="relative w-24 h-24 rounded-full bg-cyber-bg2 border border-cyber-primary/40 flex items-center justify-center text-4xl text-cyber-primary">
+                    <i class="fa-solid fa-shield-halved animate-bounce"></i>
+                </div>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-cyber-primary to-cyber-accent drop-shadow-[0_0_30px_rgba(0,212,255,0.3)]">
+                NEXSUS
+            </h1>
+            <p class="text-cyber-primary tracking-[0.4em] uppercase text-xs font-semibold mt-2 pl-[0.4em]">Assistant</p>
+            
+            <p class="mt-6 text-cyber-textMuted text-lg md:text-xl font-medium">
+                "Your Intelligent Coding & Cyber Security Assistant"
+            </p>
+
+            <div class="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono text-cyber-primary/80">
+                <div class="p-2 border border-cyber-primary/20 rounded bg-cyber-bg2/40">⚡ 60 FPS MOTION</div>
+                <div class="p-2 border border-cyber-primary/20 rounded bg-cyber-bg2/40">🔒 SECURE ENGINES</div>
+                <div class="p-2 border border-cyber-primary/20 rounded bg-cyber-bg2/40">🛠️ 16+ CAPABILITIES</div>
+                <div class="p-2 border border-cyber-primary/20 rounded bg-cyber-bg2/40">🌐 POLLINATIONS.AI</div>
+            </div>
+
+            <button onclick="enterDashboard()" class="mt-12 px-8 py-4 rounded-xl bg-gradient-to-r from-cyber-primary via-cyber-secondary to-cyber-accent text-cyber-bg1 font-bold text-sm tracking-widest uppercase shadow-[0_0_30px_rgba(0,212,255,0.4)] hover:shadow-[0_0_40px_rgba(0,212,255,0.7)] transition-all duration-300 transform hover:scale-105 active:scale-95">
+                Initialize System <i class="fa-solid fa-terminal ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="mainDashboard" class="hidden flex-1 flex relative z-10 h-screen overflow-hidden">
+        
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 glass transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col border-r border-cyber-primary/10">
+            <div class="p-6 flex items-center justify-between border-b border-cyber-primary/10">
+                <div class="flex items-center gap-3">
+                    <span class="p-2 rounded-lg bg-cyber-primary/10 border border-cyber-primary/30 text-cyber-primary">
+                        <i class="fa-solid fa-code-branch"></i>
+                    </span>
+                    <div>
+                        <h2 class="font-bold tracking-wide text-white">NEXSUS</h2>
+                        <span class="text-[10px] text-cyber-accent tracking-widest font-mono uppercase block">v2026.0.1</span>
+                    </div>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden text-cyber-textMuted hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="px-4 pt-4">
+                <button onclick="startNewChat()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyber-primary/20 to-cyber-secondary/20 border border-cyber-primary/30 hover:border-cyber-primary text-cyber-primary hover:text-white font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,212,255,0.05)]">
+                    <i class="fa-solid fa-plus text-xs"></i> New Chat
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-4 py-6 space-y-2">
+                <span class="text-[10px] font-mono tracking-widest uppercase text-cyber-textMuted/60 px-2 block mb-2">Recent Terminals</span>
+                <div id="chatHistoryList" class="space-y-1">
+                    </div>
+            </div>
+
+            <div class="p-4 border-t border-cyber-primary/10 space-y-2 bg-cyber-bg2/40 font-mono text-xs text-cyber-textMuted">
+                <button onclick="clearChatHistory()" class="w-full p-2 rounded hover:bg-red-500/10 hover:text-red-400 text-left transition flex items-center gap-2">
+                    <i class="fa-solid fa-trash-can"></i> Clear History
+                </button>
+                <button onclick="exportChat()" class="w-full p-2 rounded hover:bg-cyber-primary/10 hover:text-cyber-primary text-left transition flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Export Data log
+                </button>
+                <button onclick="alert('Nexsus Core Documentation Engine v2026 via Pollinations AI.')" class="w-full p-2 rounded hover:bg-cyber-primary/10 hover:text-cyber-primary text-left transition flex items-center gap-2">
+                    <i class="fa-solid fa-book"></i> Documentation
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 lg:ml-72 flex flex-col h-full bg-transparent relative">
+            
+            <header class="h-20 glass border-b border-cyber-primary/10 flex items-center justify-between px-6 z-20">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-cyber-primary p-2 rounded border border-cyber-primary/20 bg-cyber-primary/5">
+                        <i class="fa-solid fa-bars-staggered"></i>
+                    </button>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-white tracking-wide">Nexsus Assistant</h3>
+                            <span class="flex h-2 w-2 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-accent opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-cyber-accent"></span>
+                            </span>
+                        </div>
+                        <p class="text-xs text-cyber-textMuted/80 font-mono">Engine Status: <span class="text-cyber-primary">Pollinations.ai Operational</span></p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleTheme()" class="w-10 h-10 rounded-lg border border-cyber-primary/20 flex items-center justify-center hover:border-cyber-primary transition text-cyber-primary bg-cyber-bg2/40">
+                        <i id="themeIcon" class="fa-solid fa-moon"></i>
+                    </button>
+                    <div class="hidden sm:flex items-center bg-cyber-bg2/80 px-3 py-1.5 rounded-lg border border-cyber-primary/10 text-[11px] font-mono text-cyber-accent gap-1.5 shadow-inner">
+                        <span class="bg-cyber-accent/20 px-1 rounded text-[9px] font-bold">SECURE</span> END-TO-END TLS
+                    </div>
+                </div>
+            </header>
+
+            <div id="chatContainer" class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <div id="welcomeSuggestions" class="max-w-4xl mx-auto py-12 space-y-10">
+                    <div class="text-center space-y-2">
+                        <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyber-primary to-cyber-secondary">What paradigm are we deploying today?</h2>
+                        <p class="text-sm text-cyber-textMuted">Select a specialized workflow template below to engage tailored system rulesets.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div onclick="executeQuickAction('Generate Code', 'Buatkan saya rest api express js boilerplate menggunakan TypeScript dengan struktur folder bersih standard production.')" class="glass p-4 rounded-xl cursor-pointer glow-hover transition-all duration-300 group">
+                            <div class="flex items-center gap-3 mb-2 text-cyber-primary">
+                                <i class="fa-solid fa-code text-lg"></i>
+                                <h4 class="font-semibold text-white group-hover:text-cyber-primary transition">Generate Architecture</h4>
+                            </div>
+                            <p class="text-xs text-cyber-textMuted leading-relaxed">Design structures, complete components or microservices boilerplate elegantly.</p>
+                        </div>
+                        <div onclick="executeQuickAction('Security Audit', 'Lakukan simulasi security auditing dan analisis kerentanan OWASP Top 10 terhadap kode implementasi JWT authentication berikut secara analitis dan teoritis.')" class="glass p-4 rounded-xl cursor-pointer glow-hover transition-all duration-300 group">
+                            <div class="flex items-center gap-3 mb-2 text-cyber-accent">
+                                <i class="fa-solid fa-shield-halved text-lg"></i>
+                                <h4 class="font-semibold text-white group-hover:text-cyber-accent transition">Cyber Security Audit</h4>
+                            </div>
+                            <p class="text-xs text-cyber-textMuted leading-relaxed">Review configurations, mock safe payload injection testing scenarios, and verify hardening logs.</p>
+                        </div>
+                        <div onclick="executeQuickAction('Create Discord Bot', 'Tolong rancang arsitektur bot Discord v14 menggunakan framework discord.js (merpati.js) dengan command handler dinamis global.')" class="glass p-4 rounded-xl cursor-pointer glow-hover transition-all duration-300 group">
+                            <div class="flex items-center gap-3 mb-2 text-purple-400">
+                                <i class="fa-brands fa-discord text-lg"></i>
+                                <h4 class="font-semibold text-white group-hover:text-purple-400 transition">Discord Bot Engineering</h4>
+                            </div>
+                            <p class="text-xs text-cyber-textMuted leading-relaxed">Build sophisticated automated modules and systems tailored natively for client environments.</p>
+                        </div>
+                        <div onclick="executeQuickAction('Linux Command Execution', 'Bagaimana urutan skrip setting up Nginx reverse proxy, SSL Certbot, UFW firewall di Ubuntu Server 24.04 LTS LTS?')" class="glass p-4 rounded-xl cursor-pointer glow-hover transition-all duration-300 group">
+                            <div class="flex items-center gap-3 mb-2 text-amber-400">
+                                <i class="fa-brands fa-linux text-lg"></i>
+                                <h4 class="font-semibold text-white group-hover:text-amber-400 transition">DevOps & Linux Architecture</h4>
+                            </div>
+                            <p class="text-xs text-cyber-textMuted leading-relaxed">Configure robust deployment steps, shell scripting workflows, or continuous integrations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatLog" class="max-w-4xl mx-auto space-y-6 hidden"></div>
+            </div>
+
+            <footer class="p-4 md:p-6 bg-gradient-to-t from-cyber-bg1 via-cyber-bg1/90 to-transparent z-10">
+                <div class="max-w-4xl mx-auto glass rounded-2xl relative shadow-[0_0_40px_rgba(5,8,22,0.8)] border border-cyber-primary/20">
+                    
+                    <div class="p-3 flex items-end gap-3">
+                        <button onclick="alert('File system node interaction sandbox integration activated.')" class="p-3 text-cyber-textMuted hover:text-cyber-primary transition rounded-xl hover:bg-cyber-primary/5 mb-1" title="Attach Code/Logs">
+                            <i class="fa-solid fa-paperclip text-lg"></i>
+                        </button>
+                        
+                        <textarea id="promptInput" rows="1" class="w-full bg-transparent text-white placeholder-cyber-textMuted/50 focus:outline-none resize-none py-3 font-sans text-sm md:text-base leading-relaxed max-h-48" placeholder="Ask Nexsus Assistant anything (Code, Security configs, Infrastructure, System Design)..." oninput="autoResizeInput(this)" onkeydown="handleKeyDown(event)"></textarea>
+                        
+                        <div class="flex items-center gap-2 mb-1">
+                            <button onclick="alert('Voice synthesis pipeline initialization matrix loaded.')" class="p-3 text-cyber-textMuted hover:text-cyber-accent transition rounded-xl hover:bg-cyber-accent/5 hidden sm:inline-block" title="Voice Interaction Matrix">
+                                <i class="fa-solid fa-microphone text-lg"></i>
+                            </button>
+                            <button onclick="sendMessage()" id="sendBtn" class="p-3 bg-cyber-primary text-cyber-bg1 rounded-xl font-bold hover:bg-cyber-accent transition-all duration-300 shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+                                <i class="fa-solid fa-paper-plane text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-2 border-t border-cyber-primary/10 flex items-center justify-between text-[10px] font-mono text-cyber-textMuted/60 bg-cyber-bg2/20 rounded-b-2xl">
+                        <div>Context: System Prompt Loaded (Expert Coding & Security)</div>
+                        <div class="hidden sm:block">Model Interface: Continuous Stream</div>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        const SYSTEM_PROMPT = "Kamu adalah Nexsus Assistant, AI profesional yang ahli dalam Programming, Cyber Security, Backend Engineering, Linux Administration, DevOps, Cloud Infrastructure, Networking, Database Engineering, API Development, Discord Bot Development, dan Framework modern. Berikan jawaban yang jelas, profesional, detail, dan mudah dipahami.";
+        let currentChatId = null;
+        let activeConversations = {};
+
+        // INITIALIZE SIMULATED BACKGROUND CYBER DATA MATRIX ORCANVAS 60FPS
+        const canvas = document.getElementById('networkCanvas');
+        const ctx = canvas.getContext('2d');
+        let nodes = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            nodes = [];
+            const count = window.innerWidth < 768 ? 40 : 90;
+            for(let i=0; i<count; i++) {
+                nodes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.6,
+                    vy: (Math.random() - 0.5) * 0.6,
+                    radius: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function drawNetwork() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.classList.contains('dark');
+            ctx.strokeStyle = isDark ? 'rgba(0, 212, 255, 0.08)' : 'rgba(124, 58, 237, 0.05)';
+            ctx.fillStyle = isDark ? 'rgba(0, 255, 179, 0.4)' : 'rgba(0, 212, 255, 0.4)';
+
+            for(let i=0; i<nodes.length; i++) {
+                let n = nodes[i];
+                n.x += n.vx;
+                n.y += n.vy;
+
+                if(n.x < 0 || n.x > canvas.width) n.vx *= -1;
+                if(n.y < 0 || n.y > canvas.height) n.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, n.radius, 0, Math.PI*2);
+                ctx.fill();
+
+                for(let j=i+1; j<nodes.length; j++) {
+                    let n2 = nodes[j];
+                    let dist = Math.hypot(n.x - n2.x, n.y - n2.y);
+                    if(dist < 110) {
+                        ctx.beginPath();
+                        ctx.moveTo(n.x, n.y);
+                        ctx.lineTo(n2.x, n2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(drawNetwork);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        drawNetwork();
+
+        // SYSTEM DASHBOARD CONTROL ROUTER
+        function enterDashboard() {
+            const landing = document.getElementById('landingScreen');
+            landing.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+            setTimeout(() => {
+                landing.remove();
+                document.getElementById('mainDashboard').classList.remove('hidden');
+                loadHistoryFromStorage();
+                if(Object.keys(activeConversations).length === 0) {
+                    startNewChat();
+                }
+            }, 800);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if(html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function autoResizeInput(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
+        function handleKeyDown(e) {
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // CONVERSATION CONTROLLER MATRIX
+        function startNewChat() {
+            currentChatId = 'chat_' + Date.now();
+            activeConversations[currentChatId] = {
+                title: "New Operations System Log",
+                messages: []
+            };
+            renderChatHistoryList();
+            showInitialWorkspace();
+            if(window.innerWidth < 1024) toggleSidebar();
+        }
+
+        function showInitialWorkspace() {
+            document.getElementById('welcomeSuggestions').classList.remove('hidden');
+            document.getElementById('chatLog').classList.add('hidden');
+            document.getElementById('chatLog').innerHTML = '';
+        }
+
+        function executeQuickAction(actionName, promptText) {
+            document.getElementById('promptInput').value = promptText;
+            autoResizeInput(document.getElementById('promptInput'));
+            sendMessage();
+        }
+
+        // RENDER CHAT HISTORY SIDEBAR ELEMENTS
+        function renderChatHistoryList() {
+            const container = document.getElementById('chatHistoryList');
+            container.innerHTML = '';
+            
+            Object.keys(activeConversations).sort((a,b) => b.split('_')[1] - a.split('_')[1]).forEach(id => {
+                const chat = activeConversations[id];
+                const activeClass = id === currentChatId ? 'bg-cyber-primary/10 border-cyber-primary text-cyber-primary' : 'border-transparent hover:bg-cyber-primary/5 text-cyber-textMuted';
+                
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-lg border flex items-center justify-between cursor-pointer text-xs font-medium transition duration-200 group ${activeClass}`;
+                div.setAttribute('onclick', `switchChat('${id}')`);
+                div.innerHTML = `
+                    <div class="flex items-center gap-2 truncate">
+                        <i class="fa-solid fa-terminal text-[10px]"></i>
+                        <span class="truncate">${chat.title}</span>
+                    </div>
+                    <button onclick="event.stopPropagation(); deleteChat('${id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 text-[11px] transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function switchChat(id) {
+            currentChatId = id;
+            renderChatHistoryList();
+            
+            const history = activeConversations[id].messages;
+            if(history.length === 0) {
+                showInitialWorkspace();
+            } else {
+                document.getElementById('welcomeSuggestions').classList.add('hidden');
+                const log = document.getElementById('chatLog');
+                log.classList.remove('hidden');
+                log.innerHTML = '';
+                history.forEach(msg => appendMessageUI(msg.role, msg.content));
+                scrollToBottom();
+            }
+            if(window.innerWidth < 1024) toggleSidebar();
+        }
+
+        function deleteChat(id) {
+            delete activeConversations[id];
+            saveHistoryToStorage();
+            if(currentChatId === id) {
+                const keys = Object.keys(activeConversations);
+                if(keys.length > 0) switchChat(keys[0]);
+                else startNewChat();
+            } else {
+                renderChatHistoryList();
+            }
+        }
+
+        function clearChatHistory() {
+            if(confirm("Confirm hard wipe execution of all local log memory?")) {
+                activeConversations = {};
+                saveHistoryToStorage();
+                startNewChat();
+            }
+        }
+
+        // CORE MESSAGING INTERACTION MATRIX (POLLINATIONS.AI ROUTER)
+        async function sendMessage() {
+            const inputEl = document.getElementById('promptInput');
+            const prompt = inputEl.value.trim();
+            if(!prompt) return;
+
+            // Interface adaptation
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+            document.getElementById('welcomeSuggestions').classList.add('hidden');
+            const log = document.getElementById('chatLog');
+            log.classList.remove('hidden');
+
+            // Generate contextual update to structural memory logs
+            if(activeConversations[currentChatId].messages.length === 0) {
+                activeConversations[currentChatId].title = prompt.length > 28 ? prompt.substring(0, 25) + '...' : prompt;
+            }
+
+            // Append User query structure UI
+            activeConversations[currentChatId].messages.push({ role: 'user', content: prompt });
+            appendMessageUI('user', prompt);
+            scrollToBottom();
+            renderChatHistoryList();
+
+            // Append Placeholder UI element block for AI response stream simulation
+            const loadingDiv = appendMessageUI('assistant', '');
+            const contentBody = loadingDiv.querySelector('.msg-content');
+            contentBody.innerHTML = `<span class="typing font-mono text-xs text-cyber-accent">Securing remote cloud handshake...</span>`;
+            scrollToBottom();
+
+            try {
+                // Formatting payload matrix parameterizations using safe array tracking
+                const conversationContext = activeConversations[currentChatId].messages.map(m => ({
+                    role: m.role,
+                    content: m.content
+                }));
+                
+                // Prepend system prompt parameters explicitly
+                conversationContext.unshift({ role: 'system', content: SYSTEM_PROMPT });
+
+                const response = await fetch('https://text.pollinations.ai/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: conversationContext,
+                        seed: Math.floor(Math.random() * 9999999),
+                        jsonMode: false
+                    })
+                });
+
+                if(!response.ok) throw new Error("API Matrix processing sequence aborted.");
+                
+                const dataText = await response.text();
+                
+                // Clean payload placeholder text node and inject fully resolved engine output text
+                contentBody.innerHTML = '';
+                activeConversations[currentChatId].messages.push({ role: 'assistant', content: dataText });
+                saveHistoryToStorage();
+                
+                // Format Markdown content neatly inside UI node frame elements
+                parseAndRenderMarkdown(contentBody, dataText);
+                
+            } catch (err) {
+                contentBody.innerHTML = `<span class="text-red-400 font-mono text-xs"><i class="fa-solid fa-triangle-exclamation mr-2"></i> ERROR: Remote pipeline failure. Check network connectivity node status.</span>`;
+            } finally {
+                scrollToBottom();
+            }
+        }
+
+        // UI DOM DOMAIN GENERATION ELEMENT BUILDERS
+        function appendMessageUI(role, text) {
+            const log = document.getElementById('chatLog');
+            const msgDiv = document.createElement('div');
+            const isUser = role === 'user';
+            
+            msgDiv.className = `flex gap-4 p-5 rounded-2xl transition duration-300 transform translate-y-2 opacity-0 animate-fade-up ${isUser ? 'bg-cyber-primary/5 border border-cyber-primary/10 ml-8 md:ml-16' : 'glass border border-cyber-secondary/10 mr-8 md:mr-16'}`;
+            
+            const avatar = isUser 
+                ? `<span class="w-9 h-9 rounded-xl bg-cyber-primary/20 text-cyber-primary flex items-center justify-center border border-cyber-primary/30 text-xs font-mono">USR</span>`
+                : `<span class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyber-primary to-cyber-secondary text-cyber-bg1 flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(0,212,255,0.3)]"><i class="fa-solid fa-shield-halved text-xs"></i></span>`;
+
+            msgDiv.innerHTML = `
+                ${avatar}
+                <div class="flex-1 space-y-2 overflow-hidden">
+                    <div class="flex items-center justify-between text-[11px] font-mono text-cyber-textMuted/60">
+                        <span>${isUser ? 'USER REQ' : 'NEXSUS CORE RESP'}</span>
+                        <span>${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <div class="msg-content text-sm md:text-base leading-relaxed text-white/90 font-sans break-words"></div>
+                </div>
+            `;
+            
+            log.appendChild(msgDiv);
+            
+            // Trigger animation frame layout calculations
+            setTimeout(() => {
+                msgDiv.classList.remove('translate-y-2', 'opacity-0');
+                msgDiv.classList.add('translate-y-0', 'opacity-100');
+            }, 50);
+
+            if(text) {
+                parseAndRenderMarkdown(msgDiv.querySelector('.msg-content'), text);
+            }
+            return msgDiv;
+        }
+
+        // SIMPLIFIED PERFORMANCE MARKDOWN PARSER ENGINE FOR TEXT CODES EXTRACTION
+        function parseAndRenderMarkdown(targetContainer, text) {
+            // Regex parsing strategies targeting modular markdown code segments blocks
+            const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+            let lastIdx = 0;
+            let match;
+
+            while((match = codeBlockRegex.exec(text)) !== null) {
+                const plainTextBefore = text.substring(lastIdx, match.index);
+                if(plainTextBefore) {
+                    appendInlineMarkdownText(targetContainer, plainTextBefore);
+                }
+
+                const language = match[1] || 'code';
+                const codeContent = match[2];
+                appendCodeBlockUI(targetContainer, language, codeContent);
+                
+                lastIdx = codeBlockRegex.lastIndex;
+            }
+
+            const remainingText = text.substring(lastIdx);
+            if(remainingText) {
+                appendInlineMarkdownText(targetContainer, remainingText);
+            }
+        }
+
+        function appendInlineMarkdownText(container, text) {
+            const p = document.createElement('p');
+            p.className = 'whitespace-pre-wrap mb-2';
+            
+            // Basic inline bold syntax logic integration parser 
+            let html = text
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`([^`]+)`/g, '<code class="bg-cyber-primary/10 text-cyber-primary px-1.5 py-0.5 rounded font-mono text-xs">$1</code>');
+                
+            p.innerHTML = html;
+            container.appendChild(p);
+        }
+
+        function appendCodeBlockUI(container, lang, code) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'my-4 rounded-xl border border-cyber-primary/20 bg-[#02040a] text-left overflow-hidden font-mono text-xs md:text-sm shadow-2xl';
+            
+            const header = document.createElement('div');
+            header.className = 'bg-[#090d16] px-4 py-2 flex items-center justify-between border-b border-cyber-primary/10 text-cyber-textMuted text-[11px]';
+            header.innerHTML = `
+                <span><i class="fa-solid fa-code text-cyber-primary mr-1.5"></i> ${lang.toUpperCase()}</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="copyToClipboard(this)" class="hover:text-cyber-accent transition flex items-center gap-1"><i class="fa-solid fa-copy"></i> Copy</button>
+                    <button onclick="downloadCodeBlock('${lang}', this)" class="hover:text-cyber-primary transition flex items-center gap-1"><i class="fa-solid fa-download"></i> Download</button>
+                </div>
+            `;
+
+            const pre = document.createElement('pre');
+            pre.className = 'p-4 overflow-x-auto text-emerald-400 font-mono leading-relaxed selection:bg-cyber-secondary/30';
+            const codeNode = document.createElement('code');
+            codeNode.textContent = code.trim();
+            pre.appendChild(codeNode);
+
+            wrapper.appendChild(header);
+            wrapper.appendChild(pre);
+            container.appendChild(wrapper);
+        }
+
+        // TOOL MATRIX UTILITIES ACTIONS
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        }
+
+        function copyToClipboard(btn) {
+            const code = btn.closest('.my-4').querySelector('pre code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.innerHTML = `<i class="fa-solid fa-check text-cyber-accent"></i> Copied!`;
+                setTimeout(() => { btn.innerHTML = `<i class="fa-solid fa-copy"></i> Copy`; }, 2000);
+            });
+        }
+
+        function downloadCodeBlock(lang, btn) {
+            const code = btn.closest('.my-4').querySelector('pre code').textContent;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nexsus_build_${Date.now()}.${getExt(lang)}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function getExt(lang) {
+            const map = { javascript: 'js', typescript: 'ts', python: 'py', html: 'html', css: 'css', json: 'json', bash: 'sh' };
+            return map[lang.toLowerCase()] || 'txt';
+        }
+
+        function exportChat() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(activeConversations, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `nexsus_assistant_logs_${Date.now()}.json`);
+            dlAnchorElem.click();
+        }
+
+        // LOCAL STORAGE SYNC CONTROLS
+        function saveHistoryToStorage() {
+            localStorage.setItem('nexsus_vault_conversations', JSON.stringify(activeConversations));
+        }
+
+        function loadHistoryFromStorage() {
+            const vault = localStorage.getItem('nexsus_vault_conversations');
+            if(vault) {
+                try {
+                    activeConversations = JSON.parse(vault);
+                    const keys = Object.keys(activeConversations);
+                    if(keys.length > 0) switchChat(keys[0]);
+                } catch(e) {
+                    activeConversations = {};
+                }
+            }
+        }
+    </script>
+</body>
+</html>
