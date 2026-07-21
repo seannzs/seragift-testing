@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Happy Birthday — A Soft Pink Love Letter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SOFT PINK LUXURY — BIRTHDAY GIFT WEBSITE
+   Single-file build. Edit CONFIG at the top of the <script> to
+   personalise every text, photo, date and song.
+   ============================================================ */
+
+:root{
+  --pink-50:#FFF7FA;
+  --pink-100:#FFD9E8;
+  --pink-200:#FFC4DA;
+  --pink-300:#FFAACD;
+  --white:#FFFFFF;
+  --rose-gold:#C79A9A;
+  --rose-gold-deep:#B76E79;
+  --ink:#6B3A4A;
+  --ink-soft:#8C5B6B;
+  --shadow-pink: rgba(214,120,157,.28);
+  --shadow-soft: rgba(214,120,157,.16);
+  --serif:'Playfair Display', serif;
+  --script:'Cormorant Garamond', serif;
+  --sans:'Poppins', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overscroll-behavior:none;touch-action:pan-x pan-y;}
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--pink-50);
+  overflow:hidden;
+  width:100vw;height:100vh;height:100dvh;
+  position:fixed;inset:0;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeSpeed;
+}
+button{font-family:var(--sans);border:none;background:none;cursor:pointer;touch-action:manipulation;}
+img{-webkit-user-drag:none;user-select:none;}
+::selection{background:var(--pink-300);color:var(--white);}
+
+/* GPU layer promotion for anything that animates continuously —
+   keeps compositing on the GPU thread instead of the main thread
+   so animations stay smooth (target 120fps on capable displays). */
+.gpu{transform:translateZ(0);-webkit-transform:translateZ(0);backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+
+/* ---------- App shell & page system ---------- */
+#app{position:relative;width:100vw;height:100vh;height:100dvh;overflow:hidden;contain:layout style paint;}
+
+.page{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.94) translateZ(0);
+  pointer-events:none;
+  transition:opacity .85s cubic-bezier(.22,.61,.36,1), transform .85s cubic-bezier(.22,.61,.36,1);
+  background:
+    radial-gradient(ellipse 90% 60% at 15% 10%, rgba(255,217,232,.9), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 85% 90%, rgba(255,196,218,.85), transparent 60%),
+    linear-gradient(160deg, var(--pink-50) 0%, var(--pink-100) 55%, var(--pink-200) 100%);
+}
+/* pages fully off-screen skip layout/paint/style work entirely */
+.page.page-idle{content-visibility:hidden;contain-intrinsic-size:1px 1px;}
+.page.transitioning{will-change:opacity,transform;}
+.page.active{opacity:1;transform:scale(1) translateZ(0);pointer-events:auto;z-index:5;}
+
+.page-inner{
+  position:relative;
+  width:min(1180px, 94vw);
+  height:min(680px, 92vh);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* scalloped lace edge top & bottom, echoes the reference's torn/lace border */
+.lace-edge{
+  position:absolute;left:0;right:0;height:34px;
+  background-image:radial-gradient(circle at 10px 10px, var(--white) 9px, transparent 10px);
+  background-size:22px 22px;
+  background-repeat:repeat-x;
+  opacity:.9;z-index:3;pointer-events:none;
+}
+.lace-edge.top{top:0;background-position:0 -12px;}
+.lace-edge.bottom{bottom:0;transform:scaleY(-1);background-position:0 -12px;}
+
+/* ---------- floating decoration layer ---------- */
+#deco-layer{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden;contain:strict;}
+.deco{
+  position:absolute;
+  opacity:.85;
+  transform:translateZ(0);
+  /* no per-element filter: drop-shadow() is costly when applied to
+     20+ simultaneously-animating nodes — a plain opacity/color read
+     as "soft" without forcing the GPU to re-blur every frame. */
+}
+@keyframes floatY{
+  0%{transform:translateY(0) rotate(0deg);}
+  50%{transform:translateY(-22px) rotate(6deg);}
+  100%{transform:translateY(0) rotate(0deg);}
+}
+@keyframes driftX{
+  0%{transform:translate(0,0) rotate(-4deg);}
+  50%{transform:translate(24px,-14px) rotate(4deg);}
+  100%{transform:translate(0,0) rotate(-4deg);}
+}
+@keyframes twinkle{
+  0%,100%{opacity:.25;transform:scale(.75);}
+  50%{opacity:1;transform:scale(1.1);}
+}
+@keyframes butterflyWing{
+  0%,100%{transform:translate(0,0) rotate(0deg);}
+  25%{transform:translate(18px,-20px) rotate(8deg);}
+  50%{transform:translate(34px,4px) rotate(-4deg);}
+  75%{transform:translate(14px,20px) rotate(6deg);}
+}
+
+/* ---------- shared UI: buttons ---------- */
+.btn{
+  font-family:var(--sans);
+  font-weight:600;
+  font-size:.92rem;
+  letter-spacing:.03em;
+  color:var(--white);
+  background:linear-gradient(135deg, var(--pink-300), var(--rose-gold-deep));
+  padding:.85em 2.1em;
+  border-radius:999px;
+  box-shadow:0 8px 24px var(--shadow-pink), inset 0 1px 0 rgba(255,255,255,.4);
+  position:relative;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease;
+}
+.btn::after{
+  content:'';position:absolute;inset:-6px;border-radius:999px;
+  background:radial-gradient(circle, rgba(255,196,218,.55), transparent 70%);
+  opacity:0;transition:opacity .4s ease;z-index:-1;
+  animation:glowPulse 2.6s ease-in-out infinite;
+}
+@keyframes glowPulse{0%,100%{opacity:.15;}50%{opacity:.55;}}
+.btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 12px 30px var(--shadow-pink);}
+.btn:active{transform:translateY(0) scale(.97);}
+.btn.ghost{
+  background:var(--white);color:var(--rose-gold-deep);
+  box-shadow:0 6px 18px var(--shadow-soft);
+}
+.btn-back{
+  position:absolute;
+  top:calc(22px + env(safe-area-inset-top,0px));
+  left:calc(22px + env(safe-area-inset-left,0px));
+  z-index:6;
+  font-size:.8rem;font-weight:600;color:var(--rose-gold-deep);
+  background:rgba(255,255,255,.75);backdrop-filter:blur(6px);
+  padding:.55em 1.2em;border-radius:999px;
+  box-shadow:0 4px 14px var(--shadow-soft);
+  display:flex;align-items:center;gap:.4em;
+  transition:transform .3s ease, background .3s ease;
+}
+.btn-back:hover{transform:translateX(-3px);background:var(--white);}
+
+/* ============================================================
+   PAGE 1 — LANDING
+   ============================================================ */
+#page-1 .page-inner{
+  display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:3vw;
+  padding:2vw 3vw;
+}
+.p1-left{position:relative;z-index:4;}
+.eyebrow{
+  font-family:var(--script);font-style:italic;font-size:1.05rem;
+  color:var(--rose-gold-deep);letter-spacing:.04em;margin-bottom:.3em;
+  display:flex;align-items:center;gap:.5em;
+}
+.eyebrow svg{width:16px;height:16px;}
+.p1-title{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(2.6rem, 5.4vw, 4.6rem);
+  line-height:1.04;color:var(--ink);
+  text-shadow:0 2px 18px rgba(255,255,255,.6);
+}
+.p1-title .accent{color:var(--rose-gold-deep);font-style:italic;font-weight:600;font-family:var(--serif);}
+.p1-sub{
+  font-family:var(--script);font-style:italic;font-size:1.35rem;
+  color:var(--ink-soft);margin:.7em 0 1.6em;
+}
+.p1-name{font-weight:600;color:var(--rose-gold-deep);}
+
+.p1-right{position:relative;height:100%;display:flex;align-items:center;justify-content:center;}
+.heart-frame{
+  position:relative;width:min(300px,34vw);aspect-ratio:1/1;
+  animation:floatY 6s ease-in-out infinite;
+}
+.heart-frame .frame-ring{
+  position:absolute;inset:0;
+  clip-path:path('M150,270 C40,190 5,120 35,70 C60,28 120,20 150,70 C180,20 240,28 265,70 C295,120 260,190 150,270 Z');
+  background:linear-gradient(135deg, var(--white), var(--pink-200));
+  box-shadow:0 16px 40px var(--shadow-pink);
+}
+.heart-frame .frame-photo{
+  position:absolute;inset:9px;
+  clip-path:path('M150,270 C40,190 5,120 35,70 C60,28 120,20 150,70 C180,20 240,28 265,70 C295,120 260,190 150,270 Z');
+  background-size:cover;background-position:center;
+}
+.envelope-corner{
+  position:absolute;right:-2%;bottom:2%;width:min(220px,26vw);
+  animation:floatY 5s ease-in-out infinite .4s;
+  filter:drop-shadow(0 14px 26px var(--shadow-pink));
+}
+.envelope-corner svg{width:100%;display:block;}
+.letter-peek{
+  position:absolute;left:14%;top:-38%;width:74%;
+  background:var(--white);border-radius:4px 4px 0 0;
+  box-shadow:0 -6px 14px rgba(0,0,0,.06);
+  padding:.5em .7em;font-family:var(--script);font-style:italic;
+  font-size:.72rem;color:var(--ink-soft);text-align:center;line-height:1.3;
+  transform:rotate(-2deg);
+}
+
+/* ============================================================
+   PAGE 2 — ROAD ANIMATION
+   ============================================================ */
+#page-2 .page-inner{flex-direction:column;gap:1.6em;}
+.road-card{
+  position:relative;width:min(920px,92vw);background:var(--white);
+  border-radius:26px;box-shadow:0 24px 50px var(--shadow-pink);
+  padding:clamp(1.2em,3vw,2.4em);
+  overflow:visible;
+}
+.road-svg-wrap{position:relative;width:100%;}
+.road-svg-wrap svg{width:100%;height:auto;display:block;}
+.road-photo{
+  position:absolute;width:13%;aspect-ratio:1/1;border-radius:50%;
+  border:4px solid var(--white);box-shadow:0 8px 20px var(--shadow-pink);
+  background-size:cover;background-position:center;
+  overflow:hidden;
+}
+.road-caption{
+  text-align:center;font-size:.95rem;color:var(--ink-soft);margin-top:1.2em;font-weight:500;
+}
+.road-btn-wrap{display:flex;justify-content:center;margin-top:.9em;}
+
+/* ============================================================
+   PAGE 3 — CARD TEXT
+   ============================================================ */
+.card-white{
+  position:relative;background:var(--white);border-radius:24px;
+  padding:clamp(2em,4vw,3.2em) clamp(2.2em,5vw,4em);
+  text-align:center;box-shadow:0 26px 60px var(--shadow-pink);
+  animation:cardPop .7s cubic-bezier(.34,1.56,.64,1);
+  max-width:min(560px,88vw);
+}
+@keyframes cardPop{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
+.card-character{
+  font-size:3.4rem;margin-bottom:.2em;
+  animation:bounceChar 1.8s ease-in-out infinite;
+  display:inline-block;
+}
+@keyframes bounceChar{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-14px) rotate(3deg);}}
+.card-title{
+  font-family:var(--serif);font-weight:700;font-size:clamp(1.7rem,4vw,2.4rem);
+  color:var(--ink);margin-bottom:.5em;
+}
+.card-question{font-size:1rem;color:var(--ink-soft);margin-bottom:1.4em;}
+.card-question strong{color:var(--rose-gold-deep);}
+
+/* ============================================================
+   PAGE 4 — GIFT MENU
+   ============================================================ */
+#page-4 .page-inner{flex-direction:column;gap:2.2em;}
+.menu-title{
+  font-family:var(--serif);font-weight:600;font-style:italic;
+  font-size:clamp(1.3rem,2.6vw,1.8rem);color:var(--ink);text-align:center;
+}
+.gift-grid{display:flex;gap:clamp(1em,3vw,2.2em);flex-wrap:wrap;justify-content:center;}
+.gift-stamp{
+  width:clamp(120px,16vw,168px);aspect-ratio:1/1;
+  background:var(--white);
+  border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5em;
+  box-shadow:0 10px 26px var(--shadow-soft);
+  cursor:pointer;position:relative;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s ease;
+  contain:layout paint style;touch-action:manipulation;
+  -webkit-mask-image:radial-gradient(circle 5px at 8px 8px, transparent 5px, black 5.5px),
+                      radial-gradient(circle 5px at calc(100% - 8px) 8px, transparent 5px, black 5.5px),
+                      radial-gradient(circle 5px at 8px calc(100% - 8px), transparent 5px, black 5.5px),
+                      radial-gradient(circle 5px at calc(100% - 8px) calc(100% - 8px), transparent 5px, black 5.5px);
+  mask-image:radial-gradient(circle 5px at 8px 8px, transparent 5px, black 5.5px),
+              radial-gradient(circle 5px at calc(100% - 8px) 8px, transparent 5px, black 5.5px),
+              radial-gradient(circle 5px at 8px calc(100% - 8px), transparent 5px, black 5.5px),
+              radial-gradient(circle 5px at calc(100% - 8px) calc(100% - 8px), transparent 5px, black 5.5px);
+  border:2px dashed var(--pink-200);
+}
+.gift-stamp svg{width:44%;height:44%;color:var(--rose-gold-deep);}
+.gift-stamp span{font-size:.8rem;font-weight:600;color:var(--ink-soft);}
+.gift-stamp:hover{transform:translateY(-8px) scale(1.05);box-shadow:0 18px 34px var(--shadow-pink);}
+
+/* ============================================================
+   PAGE 5 — LETTER
+   ============================================================ */
+#page-5 .page-inner{flex-direction:column;gap:0;}
+.letter-wrap{position:relative;width:min(760px,92vw);}
+.calendar-tag{
+  position:absolute;left:clamp(-6px,-1vw,0px);top:-38px;width:78px;
+  background:var(--white);border-radius:8px;box-shadow:0 10px 22px var(--shadow-pink);
+  text-align:center;padding:.4em 0 .55em;z-index:3;
+  transform:rotate(-4deg);
+}
+.calendar-tag .cal-top{background:var(--rose-gold-deep);color:var(--white);font-size:.6rem;font-weight:700;letter-spacing:.06em;border-radius:8px 8px 0 0;padding:.2em 0;margin:-0.4em 0 .3em;}
+.calendar-tag .cal-day{font-family:var(--serif);font-weight:700;font-size:1.6rem;color:var(--ink);line-height:1;}
+.calendar-tag .cal-month{font-size:.65rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
+
+.letter-paper{
+  position:relative;z-index:2;
+  background:
+    repeating-linear-gradient(transparent, transparent 27px, rgba(199,122,151,.09) 28px),
+    var(--white);
+  border-radius:6px 20px 6px 20px;
+  box-shadow:0 26px 60px var(--shadow-pink);
+  padding:clamp(1.8em,4vw,3em) clamp(1.6em,5vw,3.4em) clamp(2.4em,5vw,3.4em);
+  transform:rotate(.6deg);
+}
+.letter-date{text-align:right;font-family:var(--script);font-style:italic;color:var(--ink-soft);font-size:.95rem;margin-bottom:.6em;}
+.letter-greeting{font-family:var(--serif);font-weight:600;font-size:1.15rem;color:var(--rose-gold-deep);margin-bottom:.7em;}
+.letter-body{
+  font-size:.92rem;line-height:1.85;color:var(--ink);white-space:pre-line;
+  max-height:34vh;overflow-y:auto;padding-right:.4em;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;contain:layout paint;
+}
+.letter-body::-webkit-scrollbar{width:5px;}
+.letter-body::-webkit-scrollbar-thumb{background:var(--pink-200);border-radius:8px;}
+.letter-sign{font-family:var(--script);font-style:italic;font-size:1.15rem;color:var(--rose-gold-deep);margin-top:1em;text-align:right;}
+.letter-envelope-deco{
+  position:absolute;right:-3%;bottom:-9%;width:110px;opacity:.9;
+  filter:drop-shadow(0 10px 18px var(--shadow-pink));
+  animation:floatY 5.6s ease-in-out infinite;
+  pointer-events:none;z-index:1;
+}
+.letter-envelope-deco svg{width:100%;}
+@media (orientation:landscape) and (max-height:600px){
+  .letter-envelope-deco{width:80px;right:-2%;bottom:-7%;opacity:.8;}
+}
+@media (orientation:landscape) and (max-height:420px){
+  .letter-envelope-deco{width:56px;right:-1%;bottom:-5%;opacity:.7;}
+}
+
+/* ============================================================
+   PAGE 6 — GALLERY
+   ============================================================ */
+#page-6 .page-inner{position:relative;}
+.gallery-stage{position:relative;width:min(960px,94vw);height:min(560px,86vh);}
+.polaroid{
+  position:absolute;width:clamp(100px,12vw,150px);
+  background:var(--white);padding:8px 8px 26px;border-radius:4px;
+  box-shadow:0 12px 26px var(--shadow-soft);
+  transition:transform .4s ease;
+  contain:layout paint style;
+  transform:translateZ(0);
+}
+.polaroid img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:2px;display:block;}
+.polaroid::after{content:'✧';position:absolute;bottom:5px;right:9px;font-size:.7rem;color:var(--pink-300);}
+
+.photo-strip-hang{
+  position:absolute;left:50%;top:2%;transform:translateX(-50%);
+  width:clamp(150px,16vw,190px);
+  display:flex;flex-direction:column;align-items:center;
+  animation:strDrop 1s cubic-bezier(.22,.9,.4,1);
+}
+@keyframes strDrop{from{transform:translate(-50%,-120%);opacity:0;}to{transform:translate(-50%,0);opacity:1;}}
+.strip-clip{width:76%;height:14px;background:var(--rose-gold-deep);border-radius:3px;box-shadow:0 3px 8px rgba(0,0,0,.15);z-index:2;}
+.strip-body{
+  background:var(--white);padding:10px 10px 18px;border-radius:2px;
+  box-shadow:0 16px 30px var(--shadow-pink);margin-top:-3px;
+}
+.strip-body img{width:100%;aspect-ratio:4/3;object-fit:cover;margin-bottom:8px;border-radius:1px;}
+.strip-body img:last-child{margin-bottom:0;}
+
+/* ============================================================
+   PAGE 7 — MUSIC
+   ============================================================ */
+#page-7 .page-inner{display:grid;grid-template-columns:.85fr 1.15fr;gap:2.4vw;align-items:center;padding:2vw 3vw;}
+.vinyl-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+.vinyl{
+  width:min(300px,30vw);aspect-ratio:1/1;border-radius:50%;
+  background:
+    repeating-radial-gradient(circle, #2c1a20 0 3px, #3a2530 4px 6px);
+  box-shadow:0 20px 50px rgba(107,58,74,.35);
+  display:flex;align-items:center;justify-content:center;
+  animation:spinVinyl 7s linear infinite;
+  animation-play-state:paused;
+}
+.vinyl.spinning{animation-play-state:running;}
+@keyframes spinVinyl{to{transform:rotate(360deg);}}
+.vinyl-label{
+  width:36%;aspect-ratio:1/1;border-radius:50%;
+  background:linear-gradient(135deg, var(--pink-300), var(--rose-gold-deep));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.4);
+}
+.vinyl-label svg{width:44%;height:44%;color:var(--white);}
+.vinyl-flower{position:absolute;top:-6%;left:8%;width:26%;animation:floatY 5s ease-in-out infinite;}
+.vinyl-flower svg{width:100%;}
+
+.music-photo-card{
+  position:relative;margin-top:1.4em;background:var(--white);padding:10px 10px 40px;
+  border-radius:6px;box-shadow:0 16px 32px var(--shadow-soft);
+  width:min(210px,60%);transform:rotate(-3deg);
+}
+.music-photo-card img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:2px;display:block;}
+.music-photo-caption{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-family:var(--script);font-style:italic;color:var(--ink-soft);font-size:.95rem;}
+
+.music-right{display:flex;flex-direction:column;gap:1.1em;}
+.music-meta .music-title{font-family:var(--serif);font-weight:700;font-size:clamp(1.3rem,2.6vw,1.8rem);color:var(--ink);}
+.music-meta .music-desc{font-size:.88rem;color:var(--ink-soft);margin-top:.3em;line-height:1.6;}
+
+.player{
+  background:var(--white);border-radius:20px;padding:1.2em 1.4em;
+  box-shadow:0 16px 34px var(--shadow-pink);
+  display:flex;flex-direction:column;gap:.8em;
+}
+.player-top{display:flex;align-items:center;gap:.9em;}
+.play-toggle{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg, var(--pink-300), var(--rose-gold-deep));
+  display:flex;align-items:center;justify-content:center;color:var(--white);
+  box-shadow:0 8px 18px var(--shadow-pink);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.play-toggle:hover{transform:scale(1.08);}
+.play-toggle svg{width:18px;height:18px;}
+.progress-wrap{flex:1;display:flex;flex-direction:column;gap:.3em;}
+.progress-bar{position:relative;height:5px;border-radius:6px;background:var(--pink-100);cursor:pointer;}
+.progress-fill{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:6px;background:linear-gradient(90deg,var(--pink-300),var(--rose-gold-deep));transform:scaleX(0);transform-origin:left center;}
+.progress-times{display:flex;justify-content:space-between;font-size:.66rem;color:var(--ink-soft);}
+.visualizer{height:44px;display:flex;align-items:flex-end;gap:3px;justify-content:center;}
+.visualizer span{width:4px;height:44px;border-radius:3px;background:linear-gradient(180deg,var(--pink-300),var(--rose-gold-deep));transform:scaleY(.14);transform-origin:bottom;transition:transform .12s ease;}
+.music-hint{font-size:.68rem;color:var(--ink-soft);text-align:center;opacity:.75;}
+
+/* ============================================================
+   PAGE 8 — ENDING
+   ============================================================ */
+#page-8 .page-inner{flex-direction:column;text-align:center;gap:.4em;}
+.ending-title{
+  font-family:var(--serif);font-weight:700;font-size:clamp(2.6rem,6vw,4.8rem);
+  color:var(--ink);text-shadow:0 4px 24px rgba(255,255,255,.7);
+  line-height:1.05;
+}
+.ending-lines{font-family:var(--script);font-style:italic;font-size:clamp(1.1rem,2.4vw,1.5rem);color:var(--rose-gold-deep);margin:.5em 0 1.4em;}
+.ending-lines span{display:block;}
+
+/* ============================================================
+   RESPONSIVE — landscape only. Portrait is intercepted by the
+   rotate-gate below, so these tiers only ever need to compress
+   a *landscape* layout down for shorter screens (phones/tablets
+   held sideways), never restack it into a portrait column.
+   ============================================================ */
+@media (orientation:landscape) and (max-height:600px){
+  .page-inner{padding:1.2vh 2vw;}
+  .p1-title{font-size:clamp(1.9rem,7vh,3.2rem);}
+  .p1-sub{font-size:1.05rem;margin:.5em 0 1em;}
+  .heart-frame{width:min(190px,30vh);}
+  .envelope-corner{width:min(150px,24vh);}
+  #page-7 .page-inner{gap:1.6vw;}
+  .vinyl{width:min(190px,32vh);}
+  .music-photo-card{width:min(150px,24vh);margin-top:.8em;}
+  .music-meta .music-title{font-size:1.2rem;}
+  .music-meta .music-desc{font-size:.78rem;}
+  .player{padding:.9em 1.1em;gap:.55em;}
+  .visualizer{height:32px;}
+  .visualizer span{height:32px;}
+  .gift-stamp{width:clamp(88px,16vh,128px);}
+  .card-white{padding:1.5em 2em;}
+  .card-character{font-size:2.4rem;}
+  .card-title{font-size:1.5rem;}
+  .letter-body{max-height:28vh;font-size:.82rem;line-height:1.6;}
+  .letter-paper{padding:1.2em 1.6em 1.6em;}
+  .calendar-tag{top:-22px;width:64px;}
+  .road-card{padding:.9em;}
+  .ending-title{font-size:clamp(2rem,9vh,3.4rem);}
+  .lace-edge{height:20px;background-size:16px 16px;}
+}
+@media (orientation:landscape) and (max-height:420px){
+  .p1-title{font-size:1.7rem;}
+  .p1-sub{font-size:.9rem;margin:.35em 0 .8em;}
+  .btn{padding:.7em 1.7em;font-size:.82rem;}
+  .heart-frame{width:min(130px,26vh);}
+  .envelope-corner{width:min(105px,20vh);}
+  .vinyl{width:min(140px,30vh);}
+  .music-photo-card{width:min(110px,20vh);padding:6px 6px 26px;}
+  .music-photo-caption{font-size:.78rem;}
+  .player{padding:.7em .9em;}
+  .visualizer{height:24px;}
+  .visualizer span{height:24px;}
+  .gift-stamp{width:clamp(72px,15vh,100px);gap:.3em;}
+  .gift-stamp span{font-size:.68rem;}
+  .menu-title{font-size:1rem;}
+  .card-white{padding:1.1em 1.5em;}
+  .card-character{font-size:1.9rem;}
+  .card-title{font-size:1.25rem;}
+  .card-question{font-size:.85rem;margin-bottom:.9em;}
+  .letter-body{max-height:22vh;font-size:.74rem;line-height:1.5;}
+  .letter-greeting{font-size:1rem;}
+  .calendar-tag{top:-18px;width:52px;}
+  .calendar-tag .cal-day{font-size:1.2rem;}
+  .polaroid{width:clamp(70px,10vh,100px);}
+  .photo-strip-hang{width:clamp(110px,14vh,150px);}
+  .btn-back{top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));padding:.4em .9em;font-size:.72rem;}
+  .ending-title{font-size:1.9rem;}
+  .ending-lines{font-size:.95rem;}
+}
+
+/* ---------- rotate-gate: politely ask portrait users to rotate ---------- */
+#rotate-gate{
+  position:fixed;inset:0;z-index:9999;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:1.1em;
+  padding:2em;text-align:center;
+  background:
+    radial-gradient(ellipse 90% 60% at 15% 10%, rgba(255,217,232,.9), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 85% 90%, rgba(255,196,218,.85), transparent 60%),
+    linear-gradient(160deg, var(--pink-50) 0%, var(--pink-100) 55%, var(--pink-200) 100%);
+}
+@media (orientation:portrait){
+  #rotate-gate{display:flex;}
+  #app{visibility:hidden;}
+}
+.rotate-gate-icon{width:64px;height:64px;color:var(--rose-gold-deep);animation:rotateHint 1.8s ease-in-out infinite;}
+@keyframes rotateHint{0%,15%{transform:rotate(0deg);}45%,55%{transform:rotate(-90deg);}85%,100%{transform:rotate(-90deg);}}
+.rotate-gate-title{font-family:var(--serif);font-weight:600;font-size:1.25rem;color:var(--ink);}
+.rotate-gate-sub{font-family:var(--sans);font-size:.85rem;color:var(--ink-soft);max-width:260px;line-height:1.5;}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.2s !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SVG ICON LIBRARY (used via <use>) — monochrome, theme-aware
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="ic-heart" viewBox="0 0 32 32"><path fill="currentColor" d="M16 29 C6 22 2 15 2 9.5 C2 4.8 5.8 1.5 10 1.5 C13 1.5 15 3 16 5.2 C17 3 19 1.5 22 1.5 C26.2 1.5 30 4.8 30 9.5 C30 15 26 22 16 29 Z"/></symbol>
+    <symbol id="ic-envelope" viewBox="0 0 64 44"><rect x="1" y="1" width="62" height="42" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M3 4 L32 26 L61 4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" opacity=".9" d="M22 24 L2 42 L2 6 Z M42 24 L62 42 L62 6 Z"/></symbol>
+    <symbol id="ic-camera" viewBox="0 0 48 40"><rect x="1" y="9" width="46" height="30" rx="5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 9 L20 3 H28 L32 9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="24" cy="24" r="9" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="24" r="3.4" fill="currentColor"/><circle cx="39" cy="15" r="1.6" fill="currentColor"/></symbol>
+    <symbol id="ic-vinyl" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="2.4" fill="currentColor"/><path d="M40 12 a19 19 0 0 1 3 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="ic-butterfly" viewBox="0 0 40 32"><path fill="currentColor" d="M20 16 C14 2 2 2 2 12 C2 20 12 22 20 16 C28 22 38 20 38 12 C38 2 26 2 20 16 Z" opacity=".85"/><rect x="19" y="8" width="2" height="18" rx="1" fill="currentColor"/></symbol>
+    <symbol id="ic-flower" viewBox="0 0 40 40"><g fill="currentColor" opacity=".9"><ellipse cx="20" cy="10" rx="7" ry="9"/><ellipse cx="20" cy="30" rx="7" ry="9"/><ellipse cx="10" cy="20" rx="9" ry="7"/><ellipse cx="30" cy="20" rx="9" ry="7"/></g><circle cx="20" cy="20" r="5" fill="#fff"/></symbol>
+    <symbol id="ic-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0 C12.6 6 13 9 24 12 C13 15 12.6 18 12 24 C11.4 18 11 15 0 12 C11 9 11.4 6 12 0 Z"/></symbol>
+    <symbol id="ic-play" viewBox="0 0 24 24"><path fill="currentColor" d="M6 4 L20 12 L6 20 Z"/></symbol>
+    <symbol id="ic-pause" viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" fill="currentColor" rx="1.5"/><rect x="14" y="4" width="5" height="16" fill="currentColor" rx="1.5"/></symbol>
+    <symbol id="ic-arrow-left" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M15 4 L7 12 L15 20"/></symbol>
+  </defs>
+</svg>
+
+<div id="rotate-gate">
+  <svg class="rotate-gate-icon" viewBox="0 0 40 40" fill="none">
+    <rect x="10" y="4" width="20" height="32" rx="4" stroke="currentColor" stroke-width="2.4"/>
+    <circle cx="20" cy="31" r="1.6" fill="currentColor"/>
+  </svg>
+  <p class="rotate-gate-title">Putar perangkatmu ✨</p>
+  <p class="rotate-gate-sub">Momen ini paling indah dilihat dalam mode landscape — putar HP atau tablet kamu untuk melanjutkan.</p>
+</div>
+
+<div id="deco-layer"></div>
+
+<div id="app">
+
+  <!-- PAGE 1 : LANDING -->
+  <section class="page active" id="page-1">
+    <div class="lace-edge bottom"></div>
+    <div class="page-inner">
+      <div class="p1-left">
+        <p class="eyebrow"><svg><use href="#ic-heart"/></svg> A little something for you</p>
+        <h1 class="p1-title">Happy<br><span class="accent">Birthday</span></h1>
+        <p class="p1-sub" id="p1-subtitle"></p>
+        <button class="btn" id="btn-open-gift">Open The Gift</button>
+      </div>
+      <div class="p1-right">
+        <div class="heart-frame gpu">
+          <div class="frame-ring"></div>
+          <div class="frame-photo" id="p1-hero-photo"></div>
+        </div>
+        <div class="envelope-corner gpu">
+          <div class="letter-peek" id="p1-letter-peek"></div>
+          <svg viewBox="0 0 64 44"><use href="#ic-envelope" style="color:var(--rose-gold-deep)"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 2 : ROAD ANIMATION -->
+  <section class="page page-idle" id="page-2">
+    <div class="lace-edge top"></div>
+    <div class="lace-edge bottom"></div>
+    <div class="page-inner">
+      <div class="road-card">
+        <div class="road-svg-wrap">
+          <svg viewBox="0 0 800 220" id="road-svg">
+            <path id="roadPath" d="M60,110 C160,20 220,20 300,110 C380,200 440,200 500,110 C560,20 640,20 740,110"
+                  fill="none" stroke="#f3d6e2" stroke-width="26" stroke-linecap="round"/>
+            <path d="M60,110 C160,20 220,20 300,110 C380,200 440,200 500,110 C560,20 640,20 740,110"
+                  fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="10 10" stroke-linecap="round"/>
+          </svg>
+          <div class="road-photo" id="road-photo-left"></div>
+          <div class="road-photo" id="road-photo-right"></div>
+        </div>
+        <p class="road-caption">Click to get your gift</p>
+        <div class="road-btn-wrap"><button class="btn" id="btn-road">Click Here</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3 : CARD TEXT -->
+  <section class="page page-idle" id="page-3">
+    <div class="page-inner">
+      <div class="card-white">
+        <span class="card-character">🐰💗</span>
+        <h2 class="card-title" id="p3-title">Aku Sedih Deh :(</h2>
+        <p class="card-question">Are you ready to receive <strong>the gift</strong>, my dear?</p>
+        <button class="btn" id="btn-yes">YES!!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4 : GIFT MENU -->
+  <section class="page page-idle" id="page-4">
+    <div class="lace-edge top"></div>
+    <div class="lace-edge bottom"></div>
+    <div class="page-inner">
+      <div>
+        <p class="menu-title">Click and open the gifts one by one ^^</p>
+        <div class="gift-grid" style="margin-top:1.6em">
+          <div class="gift-stamp" data-goto="5"><svg><use href="#ic-envelope"/></svg><span>Letter</span></div>
+          <div class="gift-stamp" data-goto="6"><svg><use href="#ic-camera"/></svg><span>Photo</span></div>
+          <div class="gift-stamp" data-goto="7"><svg><use href="#ic-vinyl"/></svg><span>Music</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 5 : LETTER -->
+  <section class="page page-idle" id="page-5">
+    <button class="btn-back" data-goto="4"><svg style="width:12px;height:12px"><use href="#ic-arrow-left"/></svg> Back</button>
+    <div class="page-inner">
+      <div class="letter-wrap">
+        <div class="calendar-tag">
+          <div class="cal-top">BDAY</div>
+          <div class="cal-day" id="cal-day">--</div>
+          <div class="cal-month" id="cal-month">---</div>
+        </div>
+        <div class="letter-paper">
+          <p class="letter-date" id="letter-date"></p>
+          <p class="letter-greeting" id="letter-greeting"></p>
+          <div class="letter-body" id="letter-body"></div>
+          <p class="letter-sign" id="letter-sign"></p>
+        </div>
+        <div class="letter-envelope-deco"><svg viewBox="0 0 64 44"><use href="#ic-envelope" style="color:var(--rose-gold-deep)"/></svg></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 6 : GALLERY -->
+  <section class="page page-idle" id="page-6">
+    <button class="btn-back" data-goto="4"><svg style="width:12px;height:12px"><use href="#ic-arrow-left"/></svg> Back</button>
+    <div class="page-inner">
+      <div class="gallery-stage" id="gallery-stage">
+        <div class="photo-strip-hang" id="photo-strip">
+          <div class="strip-clip"></div>
+          <div class="strip-body" id="strip-body"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 7 : MUSIC -->
+  <section class="page page-idle" id="page-7">
+    <button class="btn-back" data-goto="4"><svg style="width:12px;height:12px"><use href="#ic-arrow-left"/></svg> Back</button>
+    <div class="page-inner">
+      <div class="vinyl-wrap">
+        <div class="vinyl-flower gpu"><svg viewBox="0 0 40 40" style="color:var(--rose-gold-deep)"><use href="#ic-flower"/></svg></div>
+        <div class="vinyl gpu" id="vinyl">
+          <div class="vinyl-label"><svg><use href="#ic-heart"/></svg></div>
+        </div>
+      </div>
+      <div class="music-right">
+        <div style="display:flex;gap:1.4em;align-items:center;flex-wrap:wrap;justify-content:center">
+          <div class="music-photo-card">
+            <img id="music-photo" src="" alt="">
+            <p class="music-photo-caption">About You</p>
+          </div>
+          <div class="music-meta">
+            <p class="music-title" id="music-title"></p>
+            <p class="music-desc" id="music-desc"></p>
+          </div>
+        </div>
+        <div class="player">
+          <div class="player-top">
+            <button class="play-toggle" id="play-toggle"><svg id="play-icon"><use href="#ic-play"/></svg></button>
+            <div class="progress-wrap">
+              <div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+              <div class="progress-times"><span id="time-current">0:00</span><span id="time-total">0:00</span></div>
+            </div>
+          </div>
+          <div class="visualizer" id="visualizer"></div>
+          <p class="music-hint" id="music-hint"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 8 : ENDING -->
+  <section class="page page-idle" id="page-8">
+    <div class="page-inner">
+      <div>
+        <h2 class="ending-title">Happy<br>Birthday</h2>
+        <p class="ending-lines" id="ending-lines"></p>
+        <button class="btn" id="btn-replay">Replay</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<audio id="bgm" preload="auto" playsinline></audio>
+<div id="yt-player" style="position:fixed;left:-9999px;top:-9999px;width:2px;height:2px;opacity:.01;pointer-events:none;"></div>
+
+<script>
+/* ============================================================
+   CONFIG — edit everything here. Nothing else needs to change.
+   ============================================================ */
+const CONFIG = {
+  name: "Sayangku",
+  subtitle: "Special gift for special person",
+  birthdayDate: "20 July 2026",     // used for the calendar tag on the letter page
+  letterDate: "Jakarta, 20 July 2026",
+  cardMessage: "Aku Sedih Deh :(",   // the little teaser line on page 3
+
+  // Music — paste EITHER a YouTube link (youtube.com/watch?v=...,
+  // youtu.be/..., or a Shorts link) OR a direct .mp3 URL. Leave empty
+  // to keep the player idle (it still looks good, just shows a hint).
+  music: "",
+  musicAutoplay: true,
+  musicLoop: true,
+  musicVolume: 0.5,
+  musicTitle: "About You",
+  musicDesc: "A little playlist made of every quiet, ordinary moment I never want to forget with you.",
+
+  // Hero / love-frame photo on the landing page
+  heroPhoto: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80",
+
+  // Road page — the two circular photos
+  roadPhotoLeft: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80",
+  roadPhotoRight: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80",
+
+  // Music page polaroid
+  musicPhoto: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=400&q=80",
+
+  // Gallery — 6 small "polaroids" scattered around the stage
+  gallery: [
+    "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=300&q=80",
+    "https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=300&q=80",
+    "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=300&q=80",
+    "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=300&q=80",
+    "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=300&q=80",
+    "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=300&q=80"
+  ],
+
+  // Photo booth strip — exactly 3 photos, shown hanging in the middle
+  photoStrip: [
+    "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80",
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80",
+    "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=300&q=80"
+  ],
+
+  letter: `Selamat ulang tahun, Sayangku.
+
+Di hari yang luar biasa ini, aku cuma mau bilang terima kasih banyak karena kamu sudah lahir ke dunia dan menjadi bagian paling indah dalam hidupku. Terima kasih sudah memilihku untuk berjalan di sampingmu, melewati hari-hari yang menyenangkan maupun yang menantang.
+
+Aku berharap di usiamu yang baru ini, kamu selalu diberikan kesehatan, kekuatan untuk mengejar semua impianmu, dan kebahagiaan yang nggak pernah putus. Ingat ya, apa pun yang terjadi di depan nanti, kamu nggak pernah sendirian. Aku akan selalu ada di sini, di barisan paling depan, untuk mendukung dan mendoakanmu.
+
+Happy birthday, my love.
+I love you more than words can say.`,
+
+  endingLines: ["My Darling.", "My Love.", "My World."]
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = (sel, ctx=document) => ctx.querySelector(sel);
+const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+const setBg = (el, url) => { if(el && url) el.style.backgroundImage = `url('${url}')`; };
+
+/* ---------- populate content from CONFIG ---------- */
+$('#p1-subtitle').innerHTML = `${CONFIG.subtitle}<br><span class="p1-name">for ${CONFIG.name}</span>`;
+$('#p1-letter-peek').textContent = `Birthday, my darling & special day`;
+setBg($('#p1-hero-photo'), CONFIG.heroPhoto);
+setBg($('#road-photo-left'), CONFIG.roadPhotoLeft);
+setBg($('#road-photo-right'), CONFIG.roadPhotoRight);
+$('#p3-title').textContent = CONFIG.cardMessage;
+
+// letter page
+(() => {
+  const d = new Date(CONFIG.birthdayDate);
+  const day = isNaN(d) ? '20' : d.getDate();
+  const month = isNaN(d) ? 'JULY' : d.toLocaleString('en-US',{month:'long'}).toUpperCase();
+  $('#cal-day').textContent = day;
+  $('#cal-month').textContent = month;
+  $('#letter-date').textContent = CONFIG.letterDate;
+  $('#letter-greeting').textContent = `Selamat ulang tahun, ${CONFIG.name}`;
+  $('#letter-body').textContent = CONFIG.letter;
+  $('#letter-sign').textContent = `— with all my love`;
+})();
+
+// gallery page
+(() => {
+  const stage = $('#gallery-stage');
+  const positions = [
+    {top:'6%', left:'2%', rot:-8}, {top:'2%', left:'70%', rot:6},
+    {top:'46%', left:'0%', rot:5}, {top:'50%', left:'76%', rot:-6},
+    {top:'74%', left:'16%', rot:-4}, {top:'70%', left:'58%', rot:7}
+  ];
+  CONFIG.gallery.slice(0,6).forEach((url,i) => {
+    const p = positions[i % positions.length];
+    const div = document.createElement('div');
+    div.className = 'polaroid';
+    div.style.top = p.top; div.style.left = p.left;
+    div.style.transform = `rotate(${p.rot}deg)`;
+    div.style.animation = `floatY ${5+i*0.4}s ease-in-out infinite`;
+    div.innerHTML = `<img src="${url}" alt="" loading="lazy" decoding="async">`;
+    stage.appendChild(div);
+  });
+  const stripBody = $('#strip-body');
+  CONFIG.photoStrip.slice(0,3).forEach(url => {
+    const img = document.createElement('img');
+    img.loading = 'lazy'; img.decoding = 'async';
+    img.src = url;
+    stripBody.appendChild(img);
+  });
+})();
+
+// music page
+setBg(null,null);
+$('#music-photo').src = CONFIG.musicPhoto;
+$('#music-title').textContent = CONFIG.musicTitle;
+$('#music-desc').textContent = CONFIG.musicDesc;
+
+// ending page
+$('#ending-lines').innerHTML = CONFIG.endingLines.map(l => `<span>${l}</span>`).join('');
+
+/* ============================================================
+   FLOATING DECORATIONS (hearts, glitter, stars, butterflies)
+   ============================================================ */
+(() => {
+  const layer = $('#deco-layer');
+  const kinds = [
+    {sym:'ic-heart', size:[14,22], anim:'floatY', dur:[5,9], color:'var(--pink-300)'},
+    {sym:'ic-star',  size:[10,16], anim:'twinkle', dur:[2,4], color:'var(--rose-gold)'},
+    {sym:'ic-flower',size:[16,26], anim:'driftX', dur:[7,11], color:'var(--pink-200)'},
+    {sym:'ic-butterfly',size:[20,30], anim:'butterflyWing', dur:[6,10], color:'var(--rose-gold-deep)'}
+  ];
+  // scale particle count to device capability: low core-count or small
+  // screens (typical of budget/older phones) get fewer nodes so the
+  // compositor never has to juggle more layers than the GPU can hold.
+  const cores = navigator.hardwareConcurrency || 4;
+  const narrow = window.innerWidth < 700;
+  const lowPower = cores <= 4 || narrow;
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COUNT = reduceMotion ? 0 : (lowPower ? 12 : 24);
+  const frag = document.createDocumentFragment();
+  for(let i=0;i<COUNT;i++){
+    const k = kinds[i % kinds.length];
+    const size = k.size[0] + Math.random()*(k.size[1]-k.size[0]);
+    const dur = k.dur[0] + Math.random()*(k.dur[1]-k.dur[0]);
+    const el = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    el.setAttribute('class','deco');
+    el.setAttribute('viewBox','0 0 40 40');
+    el.style.width = size+'px'; el.style.height = size+'px';
+    el.style.left = Math.random()*100+'vw';
+    el.style.top = Math.random()*100+'vh';
+    el.style.color = k.color;
+    el.style.animation = `${k.anim} ${dur}s ease-in-out ${Math.random()*3}s infinite`;
+    el.innerHTML = `<use href="#${k.sym}"/>`;
+    frag.appendChild(el);
+  }
+  layer.appendChild(frag);
+})();
+
+/* ============================================================
+   PAGE NAVIGATION
+   ============================================================ */
+const pages = $$('.page');
+let navTimer = null;
+function goTo(n){
+  const target = $('#page-'+n);
+  if(!target) return;
+  const current = $('.page.active');
+  // only wake the outgoing + incoming page for the crossfade, then put
+  // the outgoing one back to sleep (content-visibility) once it settles
+  // — keeps just 1–2 pages "live" at a time instead of all eight.
+  const involved = [target, current].filter(Boolean);
+  involved.forEach(p => { p.classList.remove('page-idle'); p.classList.add('transitioning'); });
+  pages.forEach(p => p.classList.remove('active'));
+  target.classList.add('active');
+  clearTimeout(navTimer);
+  navTimer = setTimeout(() => {
+    involved.forEach(p => {
+      p.classList.remove('transitioning');
+      if(!p.classList.contains('active')) p.classList.add('page-idle');
+    });
+  }, 900);
+  if(n === 7) startVinyl(); else pauseVinylIfInactive();
+  if(n === 2) resetRoadStage();
+  vizSetActive(n === 7);
+}
+$$('[data-goto]').forEach(el => el.addEventListener('click', () => goTo(parseInt(el.dataset.goto,10))));
+
+$('#btn-open-gift').addEventListener('click', () => { tryStartMusic(); goTo(2); });
+$('#btn-yes').addEventListener('click', () => goTo(4));
+$('#btn-replay').addEventListener('click', () => goTo(1));
+
+/* ---------- PAGE 2: motion-path road animation ---------- */
+function positionRoadPhotos(){
+  const path = $('#roadPath');
+  const wrap = $('.road-svg-wrap');
+  const svg = $('#road-svg');
+  const left = $('#road-photo-left');
+  const right = $('#road-photo-right');
+  if(!path || !wrap.offsetWidth) return;
+  const total = path.getTotalLength();
+  const vb = svg.viewBox.baseVal;
+  const scaleX = wrap.getBoundingClientRect().width / vb.width;
+  const scaleY = wrap.getBoundingClientRect().height / vb.height;
+  const start = path.getPointAtLength(0);
+  const end = path.getPointAtLength(total);
+  const halfW = left.offsetWidth / 2, halfH = left.offsetHeight / 2;
+  left.style.left = (start.x*scaleX - halfW) + 'px';
+  left.style.top = (start.y*scaleY - halfH) + 'px';
+  left.style.transform = 'translate3d(0,0,0)';
+  right.style.left = (end.x*scaleX - halfW) + 'px';
+  right.style.top = (end.y*scaleY - halfH) + 'px';
+}
+function resetRoadStage(){
+  const btn = $('#btn-road');
+  btn.disabled = false; btn.style.opacity = '1';
+  $('#road-photo-right').style.opacity = '';
+  positionRoadPhotos();
+}
+window.addEventListener('resize', () => { if($('#page-2').classList.contains('active')) positionRoadPhotos(); }, {passive:true});
+positionRoadPhotos();
+setTimeout(positionRoadPhotos, 200); // fonts/layout can settle a beat late on first paint
+
+$('#btn-road').addEventListener('click', () => {
+  positionRoadPhotos(); // re-anchor in case of orientation/resize since last shown
+  const btn = $('#btn-road');
+  btn.disabled = true; btn.style.opacity = '.6';
+  const path = $('#roadPath');
+  const total = path.getTotalLength();
+  const left = $('#road-photo-left');
+  const right = $('#road-photo-right');
+  const wrap = $('.road-svg-wrap');
+  const svg = $('#road-svg');
+
+  // Do all layout reads ONCE before the animation starts — the frame
+  // loop below only writes `transform`, so the browser never has to
+  // re-run layout/reflow mid-animation (this is what actually buys
+  // back frames on slower/mobile GPUs).
+  const wrapRect = wrap.getBoundingClientRect();
+  const vb = svg.viewBox.baseVal;
+  const scaleX = wrapRect.width / vb.width;
+  const scaleY = wrapRect.height / vb.height;
+  const baseLeft = left.offsetLeft, baseTop = left.offsetTop;
+  const halfW = left.offsetWidth / 2, halfH = left.offsetHeight / 2;
+
+  left.classList.add('gpu');
+
+  const dur = 2200;
+  const t0 = performance.now();
+  function frame(now){
+    const t = Math.min(1, (now - t0) / dur);
+    const ease = t<.5 ? 2*t*t : -1+(4-2*t)*t; // easeInOutQuad
+    const pt = path.getPointAtLength(ease * total);
+    const x = pt.x*scaleX - halfW - baseLeft;
+    const y = pt.y*scaleY - halfH - baseTop;
+    left.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    if(t < 1){
+      requestAnimationFrame(frame);
+    } else {
+      setTimeout(() => goTo(3), 350);
+    }
+  }
+  requestAnimationFrame(frame);
+});
+
+/* ============================================================
+   AUDIO / MUSIC PLAYER
+   ============================================================ */
+const bgm = $('#bgm');
+let audioCtx, analyser, sourceNode, vizBars = [];
+let musicSource = 'none'; // 'mp3' | 'youtube' | 'none'
+let ytPlayer = null, ytPlayerReady = false, ytDuration = 0, ytProgressTimer = null, ytIsPlaying = false;
+let pendingAutoplay = false, autoplayTried = false;
+
+function fmtTime(s){
+  if(!isFinite(s)) return '0:00';
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+function extractYouTubeId(url){
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+(() => {
+  const viz = $('#visualizer');
+  const BAR_COUNT = 28;
+  for(let i=0;i<BAR_COUNT;i++){
+    const bar = document.createElement('span');
+    viz.appendChild(bar);
+    vizBars.push(bar);
+  }
+})();
+
+const ytVideoId = CONFIG.music ? extractYouTubeId(CONFIG.music) : null;
+
+if(ytVideoId){
+  musicSource = 'youtube';
+  $('#music-hint').textContent = '';
+  window.onYouTubeIframeAPIReady = createYTPlayer;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+} else if(CONFIG.music){
+  musicSource = 'mp3';
+  bgm.src = CONFIG.music;
+  bgm.loop = !!CONFIG.musicLoop;
+  bgm.volume = CONFIG.musicVolume ?? 0.5;
+  $('#music-hint').textContent = '';
+} else {
+  $('#music-hint').textContent = 'Tambahkan link YouTube atau file .mp3 di CONFIG.music untuk mengaktifkan player.';
+}
+
+/* ---------- YouTube backend ---------- */
+function createYTPlayer(){
+  ytPlayer = new YT.Player('yt-player', {
+    videoId: ytVideoId,
+    playerVars:{autoplay:0, controls:0, disablekb:1, fs:0, modestbranding:1, rel:0, playsinline:1, iv_load_policy:3},
+    events:{ onReady:onYTReady, onStateChange:onYTStateChange }
+  });
+}
+function onYTReady(e){
+  ytPlayerReady = true;
+  e.target.setVolume(Math.round((CONFIG.musicVolume ?? 0.5)*100));
+  ytDuration = e.target.getDuration() || 0;
+  $('#time-total').textContent = fmtTime(ytDuration);
+  if(pendingAutoplay){ pendingAutoplay = false; playMusic(); }
+}
+function onYTStateChange(e){
+  if(e.data === YT.PlayerState.PLAYING){
+    ytIsPlaying = true;
+    if(!ytDuration) ytDuration = ytPlayer.getDuration() || 0;
+    updatePlayingUI(true);
+    startYTProgressPolling();
+  } else if(e.data === YT.PlayerState.ENDED){
+    ytIsPlaying = false;
+    updatePlayingUI(false);
+    stopYTProgressPolling();
+    if(CONFIG.musicLoop){ ytPlayer.seekTo(0,true); ytPlayer.playVideo(); }
+  } else {
+    ytIsPlaying = false;
+    updatePlayingUI(false);
+    stopYTProgressPolling();
+  }
+}
+function startYTProgressPolling(){
+  stopYTProgressPolling();
+  ytProgressTimer = setInterval(() => {
+    if(!ytPlayer || !ytPlayer.getCurrentTime) return;
+    const cur = ytPlayer.getCurrentTime() || 0;
+    const dur = ytPlayer.getDuration() || ytDuration || 0;
+    const pct = dur ? cur/dur : 0;
+    $('#progress-fill').style.transform = `scaleX(${pct})`;
+    $('#time-current').textContent = fmtTime(cur);
+    if(dur) $('#time-total').textContent = fmtTime(dur);
+  }, 250);
+}
+function stopYTProgressPolling(){
+  if(ytProgressTimer){ clearInterval(ytProgressTimer); ytProgressTimer = null; }
+}
+
+/* ---------- mp3 backend (Web Audio analyser for the real visualizer) ---------- */
+function setupAnalyser(){
+  if(audioCtx || musicSource !== 'mp3') return;
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    sourceNode = audioCtx.createMediaElementSource(bgm);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    sourceNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }catch(e){ /* CORS or unsupported — fall back to idle animation */ }
+}
+
+/* ---------- shared state helpers ---------- */
+function musicIsPaused(){
+  if(musicSource === 'mp3') return bgm.paused;
+  if(musicSource === 'youtube') return !ytIsPlaying;
+  return true;
+}
+function updatePlayingUI(playing){
+  $('#play-icon').innerHTML = playing ? `<use href="#ic-pause"/>` : `<use href="#ic-play"/>`;
+  $('#vinyl').classList.toggle('spinning', playing);
+  if(playing) vizLoopStart(); else if(!vizPageActive) vizLoopStop();
+}
+
+/* ---------- visualizer (real FFT for mp3, gentle idle wave otherwise) ---------- */
+let idlePhase = 0;
+let vizRafId = null;
+let vizPageActive = false;
+function renderVisualizer(){
+  vizRafId = requestAnimationFrame(renderVisualizer);
+  if(analyser){
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+    vizBars.forEach((bar,i) => {
+      const v = data[i % data.length] || 0;
+      bar.style.transform = `scaleY(${Math.max(.14, v/255)})`;
+    });
+  } else if(!musicIsPaused()){
+    idlePhase += 0.12;
+    vizBars.forEach((bar,i) => {
+      const s = .14 + (Math.sin(idlePhase + i*0.4)+1)*0.4;
+      bar.style.transform = `scaleY(${s})`;
+    });
+  } else {
+    vizBars.forEach(bar => bar.style.transform = 'scaleY(.14)');
+  }
+}
+function vizLoopStart(){ if(vizRafId === null) renderVisualizer(); }
+function vizLoopStop(){ if(vizRafId !== null){ cancelAnimationFrame(vizRafId); vizRafId = null; } }
+function vizSetActive(isActive){
+  vizPageActive = isActive;
+  if(isActive || !musicIsPaused()) vizLoopStart(); else vizLoopStop();
+}
+
+/* ---------- unified transport controls ---------- */
+function playMusic(){
+  if(musicSource === 'mp3'){
+    setupAnalyser();
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    bgm.play().then(() => updatePlayingUI(true)).catch(()=>{});
+  } else if(musicSource === 'youtube'){
+    if(!ytPlayerReady){ pendingAutoplay = true; return; }
+    ytPlayer.playVideo();
+  }
+}
+function pauseMusic(){
+  if(musicSource === 'mp3'){
+    bgm.pause();
+    updatePlayingUI(false);
+  } else if(musicSource === 'youtube' && ytPlayerReady){
+    ytPlayer.pauseVideo();
+  }
+}
+function tryStartMusic(){
+  if(!CONFIG.musicAutoplay || musicSource === 'none' || autoplayTried) return;
+  autoplayTried = true;
+  playMusic();
+}
+
+$('#play-toggle').addEventListener('click', () => {
+  if(musicSource === 'none') return;
+  musicIsPaused() ? playMusic() : pauseMusic();
+});
+
+bgm.addEventListener('timeupdate', () => {
+  if(musicSource !== 'mp3') return;
+  const pct = bgm.duration ? (bgm.currentTime/bgm.duration) : 0;
+  $('#progress-fill').style.transform = `scaleX(${pct})`;
+  $('#time-current').textContent = fmtTime(bgm.currentTime);
+});
+bgm.addEventListener('loadedmetadata', () => {
+  if(musicSource !== 'mp3') return;
+  $('#time-total').textContent = fmtTime(bgm.duration);
+});
+$('#progress-bar').addEventListener('click', (e) => {
+  if(musicSource === 'none') return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+  if(musicSource === 'mp3'){
+    if(bgm.duration) bgm.currentTime = pct * bgm.duration;
+  } else if(musicSource === 'youtube' && ytPlayerReady){
+    const dur = ytPlayer.getDuration() || ytDuration;
+    if(dur) ytPlayer.seekTo(pct * dur, true);
+  }
+});
+
+function startVinyl(){ if(!musicIsPaused()) $('#vinyl').classList.add('spinning'); }
+function pauseVinylIfInactive(){ /* spinning stays tied to actual playback, not the current page */ }
+
+/* Best-effort landscape lock: works on some Android/Chrome contexts
+   (especially once installed as a PWA or in fullscreen); silently
+   does nothing where the API is unavailable (e.g. iOS Safari) —
+   the CSS rotate-gate above is what guarantees the experience on
+   every device regardless of API support. */
+function tryLockLandscape(){
+  try{
+    if(screen.orientation && screen.orientation.lock){
+      screen.orientation.lock('landscape').catch(()=>{});
+    }
+  }catch(e){ /* not supported — rotate-gate covers it */ }
+}
+document.addEventListener('pointerdown', tryLockLandscape, {once:true});
+
+/* first-touch fallback: some mobile browsers block autoplay entirely
+   until a genuine user gesture — the "Open The Gift" click covers this,
+   but we add one more safety net on first pointerdown anywhere. */
+document.addEventListener('pointerdown', function once(){
+  if(CONFIG.musicAutoplay && musicSource !== 'none' && musicIsPaused()){
+    playMusic();
+  }
+  document.removeEventListener('pointerdown', once);
+}, {once:true});
+</script>
+</body>
+</html>
