@@ -526,12 +526,12 @@ kamu itu spesial. Sangat.`,
   // type: 'emoji' -> pakai placeholder emoji jika belum punya foto
   // Jika sebuah link gambar gagal dimuat, otomatis jatuh ke emoji cadangan (fallback).
   gallery: [
-    { type:'emoji', src:'https://cdn.discordapp.com/avatars/1424590989431144448/0aa188de179593e4d0e2f21a5e58f832.webp?size=1024', fallback:'🌸', caption:'Pertama kali bertemu', bg:'linear-gradient(135deg,#ffd3de,#ffb3c6)' },
-    { type:'emoji', src:'', fallback:'☕', caption:'Ngobrol sampai lupa waktu', bg:'linear-gradient(135deg,#ffe9ef,#e8bfc4)' },
-    { type:'emoji', src:'', fallback:'🌅', caption:'Nonton matahari terbenam', bg:'linear-gradient(135deg,#c98a94,#e8bfc4)' },
-    { type:'emoji', src:'', fallback:'🎶', caption:'Lagu favorit kita', bg:'linear-gradient(135deg,#ffb3c6,#c98a94)' },
-    { type:'emoji', src:'', fallback:'🍰', caption:'Rayain hal kecil', bg:'linear-gradient(135deg,#ffd3de,#c98a94)' },
-    { type:'emoji', src:'', fallback:'✨', caption:'Momen paling berharga', bg:'linear-gradient(135deg,#e8bfc4,#ffb3c6)' },
+    { type:'image', src:'https://cdn.discordapp.com/avatars/1424590989431144448/0aa188de179593e4d0e2f21a5e58f832.webp?size=1024', fallback:'🌸', caption:'Pertama kali bertemu', bg:'linear-gradient(135deg,#ffd3de,#ffb3c6)' },
+    { type:'image', src:'https://cdn.discordapp.com/avatars/1424590989431144448/0aa188de179593e4d0e2f21a5e58f832.webp?size=1024', fallback:'☕', caption:'Ngobrol sampai lupa waktu', bg:'linear-gradient(135deg,#ffe9ef,#e8bfc4)' },
+    { type:'image', src:'https://cdn.discordapp.com/avatars/1424590989431144448/0aa188de179593e4d0e2f21a5e58f832.webp?size=1024', fallback:'🌅', caption:'Nonton matahari terbenam', bg:'linear-gradient(135deg,#c98a94,#e8bfc4)' },
+    { type:'image', src:'https://cdn.discordapp.com/avatars/1424590989431144448/0aa188de179593e4d0e2f21a5e58f832.webp?size=1024', fallback:'🎶', caption:'Lagu favorit kita', bg:'linear-gradient(135deg,#ffb3c6,#c98a94)' },
+    { type:'image', src:'https://cdn.discordapp.com/avatars/1424590989431144448/0aa188de179593e4d0e2f21a5e58f832.webp?size=1024', fallback:'🍰', caption:'Rayain hal kecil', bg:'linear-gradient(135deg,#ffd3de,#c98a94)' },
+    { type:'image', src:'https://cdn.discordapp.com/avatars/1424590989431144448/0aa188de179593e4d0e2f21a5e58f832.webp?size=1024', fallback:'✨', caption:'Momen paling berharga', bg:'linear-gradient(135deg,#e8bfc4,#ffb3c6)' },
   ],
   // Contoh pakai foto asli:
   // { type:'image', src:'https://contoh-link-foto.com/gambar.jpg', fallback:'📷', caption:'Judul foto', bg:'linear-gradient(135deg,#ffd3de,#ffb3c6)' },
@@ -539,8 +539,8 @@ kamu itu spesial. Sangat.`,
   // --- Musik latar (opsional) ---
   // Isi `src` dengan LINK APA SAJA (mp3 langsung, link CDN, dsb). Kosongkan ('') untuk menonaktifkan tombol musik.
   music: {
-    src: 'http://d.top4top.io/m_3853g4ss10.mp3',
-    volume: 50
+    src: 'https://d.top4top.io/m_3853g4ss10.mp3',
+    volume: 0.5
   },
 
   // --- Pengaturan performa/animasi ---
@@ -975,8 +975,7 @@ if(CONFIG.music.src){
   bgm.src = CONFIG.music.src;   // boleh link apa saja: mp3 langsung, URL CDN, dsb.
   bgm.volume = CONFIG.music.volume;
 } else {
-  musicBtn.querySelector('.icon').textContent = '🔇';
-  musicBtn.title = 'Isi CONFIG.music.src di script untuk mengaktifkan musik';
+  musicBtn.style.display = 'none'; // tidak ada musik diatur -> tombol musik disembunyikan total
 }
 
 musicBtn.addEventListener('click', ()=>{
